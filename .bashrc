@@ -127,6 +127,7 @@ esac
 
 
 alias github='cd ~/Desktop/Github'
+# for mx linux to run spotify
 alias spotify='spotify -no-zygote'
 alias thesaurus='firefox https://www.thesaurus.com/'
 alias youtube='firefox https://youtube.com'

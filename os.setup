@@ -1,0 +1,25 @@
+
+
+.fonts
+source-code-pro
+
+# programs that needs to be installed
+
+[atom]
+file-icons
+ide-python
+
+[firefox]
+enhancer for youtube
+uBlock Origin
+ADblocker ultimate
+
+[discord]
+normal setup
+
+[spotify]
+# for mx linux to run spotify
+alias spotify='spotify -no-zygote'
+
+[pavucontrol]
+Audio management
