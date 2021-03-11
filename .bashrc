@@ -127,8 +127,9 @@ esac
 
 
 alias github='cd ~/Desktop/Github'
-# for mx linux to run spotify
 alias spotify='spotify -no-zygote'
 alias thesaurus='firefox https://www.thesaurus.com/'
 alias youtube='firefox https://youtube.com'
 alias cls='clear'
+source "$HOME/.cargo/env"
+source /home/irreq/alacritty/extra/completions/alacritty.bash
