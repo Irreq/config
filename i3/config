@@ -20,12 +20,13 @@ for_window [class="^.*"] border pixel 0
 
 # [FONT]
 # Font for window titles. Will also be used by the bar.
-font pango:SourceCodePro Medium 8
+#font pango:SourceCodePro Medium 8
+font pango:PxPlus HP 100LX 8x8 8
 
 # [COLORS]
 # grey:
 # set $bg     #2f343f
-set $bg     #352714
+set $bg     #131313
 # set $fg     #404552
 set $fg     #352714
 set $tx     #2d323d
@@ -248,7 +249,7 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 
 bar {
- 	#font pango:Source Sans Pro-10 10
+ 	font pango:PxPlus HP 100LX 8x8 9
 	status_command py3status -c ~/.config/i3status/config
   colors {
 

@@ -1,0 +1,108 @@
+# i3status configuration file.
+# see "man i3status" for documentation.
+
+# It is important that this file is edited as UTF-8.
+# The following line should contain a sharp s:
+# ß
+# If the above line is not correctly displayed, fix your editor first!
+
+general {
+        colors = true
+        interval = 5
+}
+
+order += "typingstat"
+order += "volume master"
+order += "disk /"
+# order += "ipv6"
+#order += "run_watch DHCP"
+order += "networkmanager"
+#order += "wireless _first_"
+# order += "load"
+order += "cpu_temperature 0"
+order += "sysdata"
+order += "uptime"
+order += "tztime local"
+
+
+#sysdata {
+#    format = "LOAD:{format_cpu}"
+#    format_cpu = "[\?min_length=4 [\?color=used_percent {used_percent:.0f}%]]"
+#}
+
+sysdata {
+    format = "RAM: {mem_used}GB CPU: {cpu_freq_avg}GHz[\?color=cpu_used_percent {format_cpu}]"
+    format_cpu = "[\?min_length=4 [\?color=used_percent {used_percent:.0f}%]]"
+    format_cpu_separator = ""
+    thresholds = [(0, "good"), (60, "degraded"), (80, "bad")]
+    cache_timeout = 1
+}
+
+#networkmanager {
+#    format = "{general_connection} SSID:{ap_ssid} RATE:{ap_rate} IP4:{ip4_address1}"
+#    thresholds = [(0, "good"), (60, "degraded"), (80, "bad")]
+#    cache_timeout = 1
+#}
+
+networkmanager {
+    format_device = "[\?if=general_connection {general_device}:[\?soft  ][\?color=ap_signal {ap_ssid} {ap_rate} {ap_signal}%][\?soft  ][\?color=good IP4: {ip4_address1}]]"
+}
+
+wireless _first_ {
+        #format_up = "WIFI: %essid(%bitrate,%quality) IP: %ip"
+        format_up = "WIFI: %essid(%ip)"
+        format_down = "W: down"
+	      #format_quality = "%03d%s"
+}
+
+run_watch DHCP {
+	pidfile = "/var/run/dhclient*.pid"
+}
+
+#ethernet _first_ {
+#        # if you use %speed, i3status requires root privileges
+#        format_up = "E: %ip (%speed)"
+#        format_down = "E: down"
+#}
+
+#battery all {
+#        format = "%status %percentage %remaining"
+#}
+
+tztime local {
+        #format = "%Y-%m-%d %H:%M:%S"
+        format = "%Y:%m:%d:%H:%M:%S"
+}
+uptime {
+    format = "{days}d {hours}:{minutes:02d}:{seconds:02d}"
+    #format += ", up since %Y-%m-%d %H:%M:%S"
+}
+
+
+load {
+        format = "%1min"
+	#max_threshold = "0,1"
+}
+
+disk "/" {
+        format = "%avail"
+}
+
+cpu_temperature 0 {
+        format = "TEMP: %degrees°C"
+        #path = "/sys/devices/platform/coretemp.0/temp1_input"
+	path = "/sys/class/thermal/thermal_zone0/temp"
+}
+
+
+volume master {
+	format = "VOL: %volume"
+	format_muted = "vol: muted (%volume)"
+	device = "default"
+	mixer = "Master"
+	mixer_idx = 0
+}
+
+#cpu_usage {
+#	format = "%usage"
+#}
