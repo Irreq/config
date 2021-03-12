@@ -73,7 +73,10 @@ nc='\[\e[0m\]'
 if [ "$UID" = 0 ]; then
     PS1="$red\u$nc@$red\H$nc:$CYAN\w$nc\\n$red#$nc "
 else
-    PS1="$PURPLE\u$nc@$CYAN\H$nc:$GREEN\w$nc\\n$GREEN\$$nc "
+    # PS1="$PURPLE\u$nc@$CYAN\H$nc:$GREEN\w$nc$GREEN\$$nc "
+    # PS1="🎅\[\e[33;41m\][\[\e[m\]\[\e[32m\]\u\[\e[m\]\[\e[36m\]@\[\e[m\]\[\e[34m\]\h\[\e[m\]\[\e[33;41m\]]\[\e[m\]🎄 "
+  # PS1="[$red\u$nc@$red\H$nc]:$CYAN \W\$  "
+    PS1="\n[$PURPLE\u$nc@$CYAN\H$nc]⇢ $GREEN\w$nc\\n\n$GREENd$GREEN( ˘︶˘)っ$nc "
 fi
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -131,5 +134,6 @@ alias spotify='spotify -no-zygote'
 alias thesaurus='firefox https://www.thesaurus.com/'
 alias youtube='firefox https://youtube.com'
 alias cls='clear'
+#alias sam='./home/irreq/Programs/sam'
 source "$HOME/.cargo/env"
 source /home/irreq/alacritty/extra/completions/alacritty.bash
