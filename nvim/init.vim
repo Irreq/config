@@ -150,9 +150,20 @@ syntax on
 set ruler
 set number
 
+
+""##############################################
+if (has("autocmd") && !has("gui_running"))
+  augroup colorset
+    autocmd!
+    let s:white = { "gui": "#ABB2BF", "cterm": "145", "cterm16" : "7" }
+    autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
+  augroup END
+endif
+
+
 let no_buffers_menu=1
 if !exists('g:not_finish_vimplug')
-  colorscheme molokai
+  colorscheme onedark
 endif
 
 set mousemodel=popup
@@ -522,9 +533,12 @@ set laststatus=2
 "" set shortcut for open Nerdtree
 map <C-n> :NERDTreeToggle<CR>
 
-"" Turn-on onedark color scheme
 syntax on
-color onedark
+"" Turn-on onedark color scheme
+" color onedark
+
+" make vim look like terminal
+set termguicolors
 
 "" ctrlP key for ctrlP plugin
 let g:ctrlp_map = '<c-p>'
