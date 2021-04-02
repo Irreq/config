@@ -8,6 +8,9 @@
 
 general {
         colors = true
+        color_good = "#22d81c"
+        color_degraded = "#ffff00"
+        color_bad = "#ff0000"
         interval = 5
 }
 
@@ -45,7 +48,7 @@ sysdata {
 #}
 
 networkmanager {
-    format_device = "[\?if=general_connection {general_device}:[\?soft  ][\?color=ap_signal {ap_ssid} {ap_rate} {ap_signal}%][\?soft  ][\?color=good IP4: {ip4_address1}]]"
+    format_device = "[\?if=general_connection {general_device}:[\?soft  ][\?color=ap_signal {ap_ssid} {ap_rate} {ap_signal}%][\?soft  ][\?color=good IPv4: {ip4_address1}]]"
 }
 
 wireless _first_ {

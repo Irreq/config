@@ -7,7 +7,6 @@
 # The "super" key, now as the windows button
 set $mod Mod4
 
-#status_command /etc/i3_status.conf
 
 #### LOOKS ####
 
@@ -21,7 +20,8 @@ for_window [class="^.*"] border pixel 0
 # [FONT]
 # Font for window titles. Will also be used by the bar.
 #font pango:SourceCodePro Medium 8
-font pango:PxPlus HP 100LX 8x8 8
+# font pango:PxPlus HP 100LX 8x8 8
+font pango:PxPlus HP 100LX 10x11 8
 
 # [COLORS]
 # grey:
@@ -249,14 +249,15 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 
 bar {
- 	font pango:PxPlus HP 100LX 8x8 9
+ 	#font pango:PxPlus HP 100LX 8x8 9
+  font pango:PxPlus HP 100LX 10x11 9 
 	status_command py3status -c ~/.config/i3status/config
   colors {
 
     # self explanatory
     separator #999999
     # self explanatory
-    background #131313
+    background #282828
     # text
     statusline #839496
     focused_workspace #fdf6e3 #6c71c4 #fdf6e3
