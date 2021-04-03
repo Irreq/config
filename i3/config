@@ -7,7 +7,7 @@
 # The "super" key, now as the windows button
 set $mod Mod4
 
-
+exec --no-startup-id nitrogen --restore
 #### LOOKS ####
 
 # [BORDERS]             Hiding borders
@@ -250,7 +250,7 @@ bindsym $mod+r mode "resize"
 
 bar {
  	#font pango:PxPlus HP 100LX 8x8 9
-  font pango:PxPlus HP 100LX 10x11 9 
+  font pango:PxPlus HP 100LX 10x11 9
 	status_command py3status -c ~/.config/i3status/config
   colors {
 
@@ -268,18 +268,6 @@ bar {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 #### MISCELLANEOUS ####
 
 # [AUDIO]
@@ -287,7 +275,14 @@ bar {
 # bindsym Alt+PageDown exec amixer -D pulse sset Master 5%-
 bindsym $mod+comma exec amixer set Master -q 5%-
 bindsym $mod+period exec amixer set Master -q 5%+
-bindsym $mod+k exec py3-cmd click whatismyip
+# bindsym $mod+comma exec python3 -q ~/github/config/audio.py down
+# bindsym $mod+period exec python3 -q ~/github/config/audio.py up
+bindsym $mod+minus exec python3 -q ~/github/config/audio.py toggle
+bindsym $mod+ö exec python3 -q ~/github/config/audio.py next
+bindsym $mod+l exec python3 -q ~/github/config/audio.py previous
+
+
+# bindsym $mod+k exec py3-cmd click whatismyip
 
 # [LOCALE]
 # Maybe of interest
