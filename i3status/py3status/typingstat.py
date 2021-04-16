@@ -41,7 +41,7 @@ class Py3status:
     def ok(self):
 
         # foo()
-        number = randint(0, 9)
+        number = randint(8, 19)
         # number = sub_call()+str(number)
         full_text = self.py3.safe_format(self.format, {'number': number})
 

@@ -251,11 +251,12 @@ bindsym $mod+r mode "resize"
 bar {
  	#font pango:PxPlus HP 100LX 8x8 9
   font pango:PxPlus HP 100LX 10x11 9
-	status_command py3status -c ~/.config/i3status/config
+	status_command py3status -c /home/irreq/github/config/i3status/config
   colors {
 
     # self explanatory
-    separator #999999
+    #separator #999999
+    separator #282828
     # self explanatory
     background #282828
     # text
