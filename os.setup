@@ -28,3 +28,15 @@ alias spotify='spotify -no-zygote'
 
 [pavucontrol]
 Audio management
+
+
+programs to install:
+
+python, firefox, neofetch, nvim
+
+
+===================================
+======== Unnecessary stuff ========
+===================================
+
+teams, thunar, baobab, atom, alacritty, pavucontrol, discord
