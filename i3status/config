@@ -31,17 +31,30 @@ order += "cpu_temperature 0"
 order += "tztime local"
 
 
+#sysdata {
+#    #format = "RAM: {mem_used}GB CPU: {cpu_freq_avg}GHz[\?color=cpu_used_percent {format_cpu}]"
+#    format = "RAM: {mem_used}GB[\?color=mem_used_percent {format_cpu}] CPU: {cpu_freq_avg}GHz[\?color=cpu_used_percent {format_cpu}]"
+#    format_cpu = "[\?min_length=4 [\?color=used_percent {used_percent:.0f}%]]"
+#    format_cpu_separator = ""
+#    format_mem = "[\?min_length=4 [\?color=used_percent {used_percent:.0f}%]]"
+#    format_mem_separator = ""
+#    thresholds = [(0, "good"), (60, "degraded"), (80, "bad")]
+#    cache_timeout = 1
+#}
+
+
 sysdata {
-    format = "RAM: {mem_used}GB CPU: {cpu_freq_avg}GHz[\?color=cpu_used_percent {format_cpu}]"
-    format_cpu = "[\?min_length=4 [\?color=used_percent {used_percent:.0f}%]]"
-    format_cpu_separator = ""
-    thresholds = [(0, "good"), (60, "degraded"), (80, "bad")]
-    cache_timeout = 1
+  format = "RAM: {mem_used}G [\?color=mem_used_percent {mem_used_percent:.0f}%]"
+  format += " CPU: {cpu_freq_avg}GHz[\?color=cpu_used_percent {format_cpu}]"
+  format_cpu = "[\?min_length=4 [\?color=used_percent {used_percent:.0f}%]]"
+  cache_timeout = 1
+
 }
 
 networkmanager {
     #format_device = "[\?if=general_connection {general_device}:[\?soft  ][\?color=ap_signal {ap_ssid} {ap_rate} {ap_signal}%][\?soft  ][\?color=good IPv4: {ip4_address1}]]"
-    format_device = "[\?if=general_connection {general_device}:[\?soft  ][\?color=good IPv4: {ip4_address1}][\?soft  ][\?color=ap_signal {ap_signal}% {ap_ssid} ({ap_rate})][\?soft  ]]"
+    #format_device = "[\?if=general_connection {general_device}:[\?soft  ][\?color=good IPv4: {ip4_address1}][\?soft  ][\?color=ap_signal ({ap_signal}% {ap_ssid} {ap_rate})][\?soft  ]]"
+    format_device = "[\?if=general_connection {general_device}:[\?soft  ][\?color=good IPv4: {ip4_address1}][\?soft  ][\?color=ap_signal ({ap_signal}% {ap_ssid} {ap_rate})][\?soft  ]]"
 }
 
 run_watch DHCP {
@@ -63,9 +76,9 @@ disk "/" {
 
 cpu_temperature 0 {
         format = "%degrees°C"
-        #format = "🌡️: %degrees°C" ⌘
         #path = "/sys/devices/platform/coretemp.0/temp1_input"
 	path = "/sys/class/thermal/thermal_zone0/temp"
+  max_threshold = 50
 }
 
 
@@ -76,5 +89,5 @@ volume Master {
 	device = "default"
 	mixer = "Master"
 	mixer_idx = 0
-    #thresholds = [(0, "good"), (60, "degraded"), (80, "bad")]
+  #thresholds = [(0, "good"), (60, "degraded"), (80, "bad")]
 }
