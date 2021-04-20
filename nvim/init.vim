@@ -42,6 +42,9 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/syntastic'
 Plug 'Yggdroot/indentLine'
 Plug 'avelino/vim-bootstrap-updater'
+Plug 'vim-python/python-syntax'
+
+""let g:python_highlight_all = 1
 
 let g:make = 'gmake'
 if exists('make')
@@ -151,12 +154,30 @@ set ruler
 set number
 
 
+
 ""##############################################
 if (has("autocmd") && !has("gui_running"))
   augroup colorset
     autocmd!
-    let s:white = { "gui": "#ABB2BF", "cterm": "145", "cterm16" : "7" }
-    autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
+    let s:black = { "gui": "#000000", "cterm": "145", "cterm16" : "0" }
+    let s:red = { "gui": "#960000", "cterm": "145", "cterm16" : "1" }
+    let s:green = { "gui": "#248902", "cterm": "145", "cterm16" : "2" }
+    let s:yellow = { "gui": "#fc8414", "cterm": "145", "cterm16" : "3" }
+    let s:blue = { "gui": "#1459fc", "cterm": "145", "cterm16" : "4" }
+    let s:magenta = { "gui": "#75507b", "cterm": "145", "cterm16" : "5" }
+    let s:cyan = { "gui": "#06989a", "cterm": "145", "cterm16" : "6" }
+    let s:white = { "gui": "#d3d7cf", "cterm": "145", "cterm16" : "7" }
+
+    let s:black = { "gui": "#555753", "cterm": "145", "cterm16" : "8" }
+    let s:red = { "gui": "#ff0000", "cterm": "145", "cterm16" : "9" }
+    let s:green = { "gui": "#22d81c", "cterm": "145", "cterm16" : "10" }
+    let s:yellow = { "gui": "#ffff00", "cterm": "145", "cterm16" : "11" }
+    let s:blue = { "gui": "#32afff", "cterm": "145", "cterm16" : "12" }
+    let s:magenta = { "gui": "#ad7fa8", "cterm": "145", "cterm16" : "13" }
+    let s:cyan = { "gui": "#34e2e2", "cterm": "145", "cterm16" : "14" }
+    let s:white = { "gui": "#ffffff", "cterm": "145", "cterm16" : "15" }
+
+    ""autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
   augroup END
 endif
 
@@ -165,6 +186,52 @@ let no_buffers_menu=1
 if !exists('g:not_finish_vimplug')
   colorscheme onedark
 endif
+
+let s:black = { "gui": "#000000", "cterm": "145", "cterm16" : "0" }
+let s:red = { "gui": "#960000", "cterm": "145", "cterm16" : "1" }
+let s:green = { "gui": "#248902", "cterm": "145", "cterm16" : "2" }
+let s:yellow = { "gui": "#fc8414", "cterm": "145", "cterm16" : "3" }
+let s:blue = { "gui": "#1459fc", "cterm": "145", "cterm16" : "4" }
+let s:magenta = { "gui": "#75507b", "cterm": "145", "cterm16" : "5" }
+let s:cyan = { "gui": "#06989a", "cterm": "145", "cterm16" : "6" }
+let s:white = { "gui": "#d3d7cf", "cterm": "145", "cterm16" : "7" }
+
+let s:black = { "gui": "#555753", "cterm": "145", "cterm16" : "8" }
+let s:red = { "gui": "#ff0000", "cterm": "145", "cterm16" : "9" }
+let s:green = { "gui": "#22d81c", "cterm": "145", "cterm16" : "10" }
+let s:yellow = { "gui": "#ffff00", "cterm": "145", "cterm16" : "11" }
+let s:blue = { "gui": "#32afff", "cterm": "145", "cterm16" : "12" }
+let s:magenta = { "gui": "#ad7fa8", "cterm": "145", "cterm16" : "13" }
+let s:cyan = { "gui": "#34e2e2", "cterm": "145", "cterm16" : "14" }
+let s:white = { "gui": "#ffffff", "cterm": "145", "cterm16" : "15" }
+
+""hi Red1d guifg=#8f0000
+""hi Red2d guifg=#702020
+""hi Red3d guifg=#500707
+""hi Red1p guifg=#fa4740
+""hi Red2p guifg=#f08787
+""hi Red3p guifg=#f0a787
+""
+""hi Blue1d guifg=#1010f0
+""hi Blue2d guifg=#101090
+""hi Blue3d guifg=#103050
+""hi Blue1p guifg=#8080f0
+""hi Blue2p guifg=#a080f0
+""hi Blue3p guifg=#70a0f0
+""
+""hi Green1d guifg=#01a001
+""hi Green2d guifg=#017001
+""hi Green3d guifg=#015001
+""hi Green1p guifg=#a0f0a0
+""hi Green2p guifg=#c0ffa0
+""hi Green3p guifg=#c0f010
+""
+""hi Yellow1p guifg=#f0f000
+""hi Yellow2p guifg=#fafa0a
+""hi Yellow3p guifg=#fdda0a
+""hi Yellow1d guifg=#adaa0a
+""hi Yellow2d guifg=#8a8a01
+""hi Yellow3d guifg=#4a4a01
 
 set mousemodel=popup
 set t_Co=256

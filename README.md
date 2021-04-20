@@ -1,4 +1,4 @@
 # config
 directory of my .config files for some software
 
-Make sure to install correctly
+make sure to link to software: ```ln ~/github/config/{SOFTWARE} ~/YOUR/LOCATION/HERE```

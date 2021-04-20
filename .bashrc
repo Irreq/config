@@ -130,13 +130,26 @@ xterm*|rxvt*)
 esac
 
 
+
+
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx; fi
+
 alias github='cd ~/Desktop/Github'
 alias spotify='spotify -no-zygote'
 alias thesaurus='firefox https://www.thesaurus.com/'
 alias youtube='firefox https://youtube.com'
 alias cls='clear'
+
+# for flatpak:
+alias teams='flatpak run com.microsoft.Teams'
+alias discord='flatpak run com.discordapp.Discord'
+
+
 #alias sam='./home/irreq/Programs/sam'
 source "$HOME/.cargo/env"
 source /home/irreq/alacritty/extra/completions/alacritty.bash
 #source $HOME/.config/nvim/plug-config/rnvimr.vim
 export EDITOR='nvim'
+
+# for void:
+export $(dbus-launch)

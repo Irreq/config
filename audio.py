@@ -126,6 +126,7 @@ def pause():
                          reply_handler=do_nothing, error_handler=do_nothing)
     if player_names != []:
         for i in os.listdir(DIRECTORY+'/paused-players/'):
+
             os.remove(DIRECTORY+'/paused-players/'+i)
         for player_name in player_names:
             player_status_file = open(DIRECTORY+'/paused-players/'+player_name,
