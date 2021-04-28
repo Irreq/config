@@ -6,26 +6,41 @@ import signal
 import locale
 import time
 
-# Add programs here with key being what you call, and value being the executing path
-# It would be convenient to order the programs in the frequency you use them
+# It might be convenient to order alias by frequency
 programs = {
+    # Programs
     "atom": "flatpak run io.atom.Atom",
     "discord": "flatpak run com.discordapp.Discord",
-    "firefox": "firefox",
-    "github": "firefox https://github.com/Irreq",
+
     "pavucontrol": "pavucontrol",
     "spotify": "spotify -no-zygote",
     "teams": "flatpak run com.microsoft.Teams",
     "nvim": "nvim",
     "vim": "vim",
-    "youtube": "firefox https://youtube.com",
-    "wikipedia": "https://sv.wikipedia.org",
-    "alacritty": "alacritty",
-}
+    "python3": "python3",
 
-simple_programs = [
-    "ls", "cat", "top", "python3",
-]
+
+    # Web
+    "firefox": "firefox",
+    "github": "firefox https://github.com/Irreq",
+    "youtube": "firefox https://youtube.com",
+
+    # System
+    "update": "sudo xbps-install -Su",
+    "reboot": "sudo reboot now",
+    "shutdown": "sudo shutdown -h now",
+    "ls": "ls",
+    "cat": "cat",
+
+    # Meta
+    "open": "atom",
+    "browse": "thunar",
+    "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web", # QUERY is what you type after search
+    "terminal": "alacritty",
+    "keyboard": "setxkbmap se",
+    "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
+    "screen": "xrandr --auto --output VGA-1 --mode 1920x1200 --right-of LVDS-1",
+}
 
 meta = {
     "menu": "dmenu",
@@ -33,6 +48,7 @@ meta = {
     "fileopener": "atom",           # Program to handle opening files
     "filebrowser": "thunar",          # Program to handle opening paths
     "webbrowser": "firefox",           # Program to hangle opening urls
+    "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web",
     "sign": "</>",                        # The placeholder?
     "menu_arguments": [
         # "-b",                           # Place at bottom of screen
@@ -46,7 +62,10 @@ meta = {
         "-sb",                          # Selected element background colour
         "#111111",
         "-fn",                          # Font and size'
-        "-*-PxPlus-HP-100LX-8x8-*-*-*-14-*-*-*-*-*-*-*",
+        # "-*-PxPlus-HP-100LX-8x8-*-*-*-14-*-*-*-*-*-*-*",
+        "PxPlus-HP-100LX-8x8:pixelsize=14",
+        # "-*-*-*-*-14-*-*-*-*-*-*-*",
+        # "PxPlus HP 100LX 10x11 9"
     ],
     "path_shellCommand": "~/.dmenuEextended_shellCommand.sh",
     "timeout": 5,
@@ -67,7 +86,8 @@ class Menu(object):
     def load_cache(self):
         """Organize available programs"""
         cache = list(programs.keys())
-        cache.extend(simple_programs)
+        # cache.extend(simple_programs)
+        # cache = list(q)
         return cache
 
     def command_output(self, command, split=True):
@@ -137,17 +157,30 @@ class Menu(object):
         elif query.startswith("wikipedia "):
             query = "+".join(query[len("wikipedia "):].split())
             os.system(f"{meta['webbrowser']} https://en.wikipedia.org/wiki/{query}")
+        elif query.startswith("search "):
+            query = "+".join(query[len("search "):].split())
+            tmp = meta["search"]
+            tmp = tmp.replace("QUERY", query)
+            os.system(tmp)
+        elif query.startswith("keyboard "):
+            query = "setxkbmap "+query[len("keyboard "):]
+            # os.system(query)
+            self.open_terminal(query)
         elif query.startswith("vim"):
             self.open_terminal(query)
+        elif query.startswith("teams"):
+            self.open_terminal("alacritty | "+programs[query])
         elif query.startswith("top"):
             self.open_terminal(query)
         elif query.startswith("py"):
             self.open_terminal(query)
+        elif query.startswith("test"):
+            self.open_terminal("neofetch")
 
         else:
             # If query in executable programs
             if query in programs.keys():
-                os.system(programs[query])
+                self.open_terminal(programs[query])
 
             # Run as a command in terminal without opening a window
             else:

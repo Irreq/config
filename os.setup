@@ -35,8 +35,19 @@ programs to install:
 python, firefox, neofetch, nvim
 
 
-===================================
-======== Unnecessary stuff ========
-===================================
+-----------------------------------
+---------- Screen layout ----------
+-----------------------------------
+xrandr --auto --output VGA-1 --mode 1920x1200 --right-of LVDS-1
 
+-----------------------------------
+---------- WiFi support -----------
+-----------------------------------
+wpa_passphrase SSID pass_phrase >> /etc/wpa_supplicant/wpa_supplicant-wlo1.conf
+wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf
+
+
+-----------------------------------
+-------- Unnecessary stuff --------
+-----------------------------------
 teams, thunar, baobab, atom, alacritty, pavucontrol, discord
