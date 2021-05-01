@@ -39,7 +39,9 @@ programs = {
     "terminal": "alacritty",
     "keyboard": "setxkbmap se",
     "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
-    "screen": "xrandr --auto --output VGA-1 --mode 1920x1200 --right-of LVDS-1",
+    # "screen": "xrandr --auto --output VGA-1 --mode 1920x1200 --right-of LVDS-1",
+    # "screen": "xrandr --output HDMI-1 --mode 1920x1200",
+    "screen": "xrandr --output VGA-1 --off --output LVDS-1 --off --output HDMI-1 --mode 1920x1200 --pos 0x0 --rotate normal",
 }
 
 meta = {
@@ -51,7 +53,7 @@ meta = {
     "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web",
     "sign": "</>",                        # The placeholder?
     "menu_arguments": [
-        # "-b",                           # Place at bottom of screen
+        "-b",                           # Place at bottom of screen
         "-i",                           # Case insensitive searching
         "-nf",                          # Element foreground colour
         "#888888",

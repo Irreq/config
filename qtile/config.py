@@ -1,26 +1,71 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from fnmatch import fnmatch
 
-from libqtile import bar, hook, layout, widget
+from libqtile import bar, hook, pangocffi, layout, widget
 from libqtile.command import lazy
-from libqtile.config import Click, Drag, Group, Key, Screen
+from libqtile.config import Group, Key, Screen
 from libqtile.widget.base import ORIENTATION_HORIZONTAL
 from libqtile.widget.base import _TextBox as BaseTextBox
 
 MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
-SYSTEM_PATH = "/home/irreq/github/config/"
 FONTSIZE = 12
+SYSTEM_PATH = "/home/irreq/github/config/"
+
+programs = {
+    # Programs
+    "alacritty": "alacritty",
+    "atom": "flatpak run io.atom.Atom",
+    "discord": "flatpak run com.discordapp.Discord",
+
+    "pavucontrol": "pavucontrol",
+    "spotify": "spotify -no-zygote",
+    "teams": "flatpak run com.microsoft.Teams",
+    "nvim": "nvim",
+    "vim": "vim",
+    "python3": "python3",
+
+
+    # Web
+    "firefox": "firefox",
+    "github": "firefox https://github.com/Irreq",
+    "youtube": "https://www.youtube.com/results?search_query=QUERY",
+
+    # System
+    "update": "sudo xbps-install -Su",
+    "reboot": "sudo reboot now",
+    "shutdown": "sudo shutdown -h now",
+    "ls": "ls",
+    "cat": "cat",
+
+    # Meta
+    "open": "atom",
+    "browse": "thunar",
+    "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web", # QUERY is what you type after search
+    "terminal": "alacritty",
+    "keyboard": "setxkbmap se",
+    "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
+    # "screen": "xrandr --auto --output VGA-1 --mode 1920x1200 --right-of LVDS-1",
+    # "screen": "xrandr --output HDMI-1 --mode 1920x1200",
+    "screen": "xrandr --output VGA-1 --off --output LVDS-1 --off --output HDMI-1 --mode 1920x1200 --pos 0x0 --rotate normal",
+}
+
+
 
 class Commands:
     search = "firefox"
     terminal = "alacritty"
-    volume_up = "amixer -q -c 0 sset Headset 5dB+"
-    volume_down = "amixer -q -c 0 sset Headset 5dB-"
+    volume_up = "amixer -q -c 0 sset Master 5dB+"
+    volume_down = "amixer -q -c 0 sset Master 5dB-"
     audio_toggle = "python3 -q {}audio.py toggle".format(SYSTEM_PATH)
     menu = "python3 -q {}kisspy_menu.py".format(SYSTEM_PATH)
 
 command = Commands()
+
+def make_correct(string, length, suffix="", filler="0"):
+    difference = length-len(string)
+    return string[:length] + filler*difference*(difference >= 0) + suffix
 
 class MemData():
     def __init__(self):
@@ -40,6 +85,12 @@ class MemData():
 
     def main(self):
         return self._calc_mem_values(self._get_meminfo())
+
+    def get_memusage(self):
+        result_mem = self.main()
+        used = make_correct(str(result_mem[1]), 4, suffix="GB")
+        mem_percentage = make_correct(str(int(result_mem[2])), 2, suffix="%")
+        return " MEM: {} {}".format(used, mem_percentage)
 
 
 class SysData():
@@ -131,46 +182,21 @@ class SysData():
 
         return [low, mean, high, core_usage]
 
+    def get_cpuusage(self):
+        result_cpu = self.main()
+        speed = make_correct(str(result_cpu[1]), 4, suffix="GHz")
+        cpu_percentage = str(int(sum(result_cpu[3])/len(result_cpu[3])))+"%"
+        return " CPU: {} {}".format(speed, cpu_percentage)
+
 
 cpu = SysData()
 mem = MemData()
 
-def make_correct(string, length, suffix="", filler="0"):
-    difference = length-len(string)
-    return string[:length] + filler*difference*(difference >= 0) + suffix
+def get_datetime():
+    return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
 def get_everything(*args):
-
-    result_mem = mem.main()
-    result_cpu = cpu.main()
-    a = make_correct
-    # total = a(str(result_mem[0]), 4, suffix="GB")
-    used = a(str(result_mem[1]), 4, suffix="GB")
-    mem_percentage = a(str(result_mem[2]), 2, suffix="%")
-
-    # low = a(str(result_cpu[0]), 4, suffix="GHz")
-    mean = a(str(result_cpu[1]), 4, suffix="GHz")
-    # high = a(str(result_cpu[2]), 4, suffix="GHz")
-
-    # cpu_percentage = ""
-    # for i in result_cpu[3]:
-    #     cpu_percentage += a(str(i), 2, suffix="%")+ " "
-
-    cpu_percentage = str(int(sum(result_cpu[3])/len(result_cpu[3])))+"%"
-
-    # return f"RAM: {total} {used} {mem_percentage} CPU: {low} {mean} {high} {cpu_percentage}"
-    return f"RAM: {used} {mem_percentage} CPU: {mean} {cpu_percentage}"
-
-
-class Logger():
-    """Replacement for qtile logger"""
-    def __init__(self):
-        pass
-    def error(self, string):
-        with open(SYSTEM_PATH+"qtile/log.txt", "a") as f:
-            f.write("\n"+string)
-
-logger = Logger()
+    return mem.get_memusage() + cpu.get_cpuusage()
 
 
 class CustomBaseTextBox(BaseTextBox):
@@ -259,14 +285,101 @@ hook.subscribe.hooks.add("prompt_focus")
 hook.subscribe.hooks.add("prompt_unfocus")
 
 
-class CustomPrompt(widget.Prompt):
+class SuggestionPrompt(widget.Prompt):
+
+    max_suggestions = 100
+    available = []
+    current_query = programs
+    chosen = ""
+
     def startInput(self, *a, **kw):  # noqa: N802
         hook.fire('prompt_focus')
         return super().startInput(*a, **kw)
 
+    def flush(self):
+        if self.chosen != "":
+            self.user_input = self.chosen
+
+        self.chosen = ""
+        self.current_query = programs
+
     def _unfocus(self):
         hook.fire('prompt_unfocus')
+        self.flush()
         return super()._unfocus()
+
+    def _update(self):
+        if self.active:
+
+            self.text = self.archived_input or self.user_input
+
+            self.available = [k for k in self.current_query.keys() if self.text in k]
+            self.available.sort()
+
+            cursor = pangocffi.markup_escape_text(" ")
+
+            if self.cursor_position < len(self.text):
+                self.chosen = ""
+
+                txt1 = self.text[:self.cursor_position]
+                txt2 = self.text[self.cursor_position]
+                txt3 = self.text[self.cursor_position + 1:]
+                for text in (txt1, txt2, txt3):
+                    text = pangocffi.markup_escape_text(text)
+                txt2 = self._highlight_text(txt2)
+                self.text = "{0}{1}{2}{3}".format(txt1, txt2, txt3, cursor)
+
+            # Will display the alternatives as suggestions
+            elif len(self.text) + 1 <= self.cursor_position <= len(self.text) + len(self.available):
+                self.chosen = self.available[int(self.cursor_position-len(self.text)-1)]
+
+            else:
+                self.text = pangocffi.markup_escape_text(self.text)
+                self.text += self._highlight_text(cursor)
+
+            if self.chosen != "":
+                self.text = self.chosen
+
+
+            self.text = self.display + self.text
+
+            if self.available:
+                self.text += " | " + " ".join(self.available[:self.max_suggestions]) + " | "
+
+        else:
+            self.text = ""
+        self.bar.draw()
+
+    def _send_cmd(self):
+        """Parse the omitted query to find specific things"""
+        self.flush()
+        separate = self.user_input.split()
+        if separate[0] in self.current_query:
+            tmp = self.current_query[separate[0]]
+            if len(separate) > 1:
+                if "QUERY" in tmp:
+                    tmp = tmp.replace("QUERY", "+".join(separate[1:]))
+                else:
+                    tmp += " "+" ".join(separate[1:])
+            self.user_input = tmp
+
+        super()._send_cmd()
+
+    def _cursor_to_left(self):
+        # Move cursor to left, if possible
+        if self.cursor_position:
+            self.cursor_position -= 1
+        else:
+            self._alert()
+
+    def _cursor_to_right(self):
+        # move cursor to right, if possible
+        command = self.archived_input or self.user_input
+
+        if self.cursor_position < len(command) + len(self.available):
+            self.cursor_position += 1
+        else:
+            self._alert()
 
 
 class CustomWindowName(widget.WindowName):
@@ -310,6 +423,8 @@ def user_keymap(mod, shift, control, alt):
     yield mod + "k", lazy.layout.up()
     yield mod + "l", lazy.layout.right()
 
+    yield mod + "n", lazy.layout.normalize()
+
     yield mod + shift + "h", lazy.layout.shuffle_left()
     yield mod + shift + "j", lazy.layout.shuffle_down()
     yield mod + shift + "k", lazy.layout.shuffle_up()
@@ -320,24 +435,21 @@ def user_keymap(mod, shift, control, alt):
     yield mod + control + "k", lazy.layout.grow_up()
     yield mod + control + "l", lazy.layout.grow_right()
 
-    yield mod + alt + "h", lazy.layout.flip_left()
-    yield mod + alt + "j", lazy.layout.flip_down()
-    yield mod + alt + "k", lazy.layout.flip_up()
-    yield mod + alt + "l", lazy.layout.flip_right()
 
-    yield mod + "n", lazy.layout.normalize()
+    # Audio
+    yield mod + "comma", lazy.spawn(command.volume_down)
+    yield mod + "period", lazy.spawn(command.volume_up)
+    yield mod + "minus", lazy.spawn(command.audio_toggle)
 
-    yield alt + "F4", lazy.window.kill()
-    yield mod + shift + "r", lazy.restart()
-    yield control + alt + "q", lazy.shutdown()
-    yield mod + "r", lazy.spawncmd()
-
-    yield mod + "F11", lazy.window.toggle_fullscreen()
-    yield mod + "F12", lazy.spawn(command.audio_toggle)
-
+    # Start stuff
+    yield mod + "o", lazy.spawncmd() # Run a command
     yield mod + "Return", lazy.spawn(command.terminal)
-    yield mod + "y", lazy.spawn(command.search)
-    yield mod + "o", lazy.spawn(command.menu)
+    yield mod + "y", lazy.spawn(command.search) # As in "why" lol
+    yield mod + "p", lazy.window.toggle_fullscreen()
+
+    # Stop stuff
+    yield mod + shift + "q", lazy.window.kill()
+    yield mod + shift + "r", lazy.restart()
 
 
 def make_keymap(user_map):
@@ -370,11 +482,9 @@ def make_keymap(user_map):
             mods = k._mods
             k = k._key
         else:
-            logger.error('Bad key %s', k)
             continue
 
         if 'lock' in mods:
-            logger.error('You must not use "lock" modifier yourself')
             continue
 
         result.append(Key(list(mods), k, cmd))
@@ -388,10 +498,10 @@ keys = make_keymap(user_keymap)
 class ColorScheme:
     bg = "#282828"
     highlight_bg = "#888888"
-    urgent_bg = "#fe8964"
+    urgent_bg = "#e336e9"
 
     text = "#ffffff"
-    inactive_text = "#534353"
+    inactive_text = "#700a74"
 
     border = "#333333"
     border_focus = urgent_bg
@@ -418,8 +528,8 @@ widget_defaults = dict(
 
 
 def create_widgets():
-    yield CustomPrompt(
-        prompt="$ ",
+    yield SuggestionPrompt(
+        prompt=": ",
         padding=10,
         foreground=ColorScheme.highlight_text,
         cursor_color=ColorScheme.highlight_text,
@@ -469,7 +579,7 @@ screens = [
     Screen(
         bottom=bar.Bar(
             list(create_widgets()),
-            20,
+            FONTSIZE+6, # bar height
             background=ColorScheme.bg,
         ),
     ),
@@ -484,4 +594,8 @@ bring_front_click = True
 cursor_warp = False
 auto_fullscreen = True
 focus_on_window_activation = "urgent"
+@hook.subscribe.startup_once
+def start_once():
+    for i in ["keyboard", "screen", "atom", "firefox"]:
+        lazy.spawn(programs[i])
 wmname = "LG3D"
