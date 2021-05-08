@@ -1,4 +1,23 @@
 # -*- coding: utf-8 -*-
+#
+# Author: Irreq
+#
+# I wanted to create an desktop environment with as little dependencies as necessary.
+# Many of programs like 'dmenu' and 'amixer' has been implented in python to use a
+# smaller number of packages.
+#
+# Benefits from this config file:
+# + VIM-keybinds (Arrow keys aren't needed)
+# + CPU and memory usage are indivudual classes and should work for broader architecture
+# + Easy update on a time interval for any function
+# + A static program launcher, as a simple version of dmenu_run
+#
+# Bad stuff from this config file:
+# - Little to no automation, you must specifically edit the programs in 'programs'
+# - No mouse (But if you are reading this, you probably know how to navigate using a keyboard)
+
+import os
+
 from datetime import datetime
 from fnmatch import fnmatch
 
@@ -11,57 +30,59 @@ from libqtile.widget.base import _TextBox as BaseTextBox
 MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
 FONTSIZE = 12
-SYSTEM_PATH = "/home/irreq/github/config/"
+
+result = "Hello, World!"
 
 programs = {
     # Programs
     "alacritty": "alacritty",
-    "atom": "flatpak run io.atom.Atom",
     "discord": "flatpak run com.discordapp.Discord",
+    "teams": r"flatpak run com.microsoft.Teams",
 
-    "pavucontrol": "pavucontrol",
-    "spotify": "spotify -no-zygote",
-    "teams": "flatpak run com.microsoft.Teams",
+    # Programming
+    "atom": "flatpak run io.atom.Atom",
     "nvim": "nvim",
     "vim": "vim",
     "python3": "python3",
-
 
     # Web
     "firefox": "firefox",
     "github": "firefox https://github.com/Irreq",
     "youtube": "https://www.youtube.com/results?search_query=QUERY",
 
-    # System
+    # System (be careful, some stuff might break)
     "update": "sudo xbps-install -Su",
     "reboot": "sudo reboot now",
     "shutdown": "sudo shutdown -h now",
-    "ls": "ls",
-    "cat": "cat",
+
+    # Audio
+    "vol_up": "amixer -q -c 0 sset Master 5dB+",
+    "vol_down": "amixer -q -c 0 sset Master 5dB-",
+    "pause": "python3 -q /home/irreq/github/config/audio.py toggle",
+    "pavucontrol": "pavucontrol",
+    "spotify": "spotify -no-zygote",
 
     # Meta
     "open": "atom",
-    "browse": "thunar",
+    "filebrowser": "thunar",
+    "searchbrowser": "firefox",
     "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web", # QUERY is what you type after search
     "terminal": "alacritty",
     "keyboard": "setxkbmap se",
     "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
-    # "screen": "xrandr --auto --output VGA-1 --mode 1920x1200 --right-of LVDS-1",
-    # "screen": "xrandr --output HDMI-1 --mode 1920x1200",
-    "screen": "xrandr --output VGA-1 --off --output LVDS-1 --off --output HDMI-1 --mode 1920x1200 --pos 0x0 --rotate normal",
+    #"screen": "xrandr --output VGA-1 --off --output LVDS-1 --off --output HDMI-1 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen": "xrandr --output HDMI-1 --off --output LVDS-1 --off --output VGA-1 --mode 1920x1200 --pos 0x0 --rotate normal",
 }
 
+class Colors:
+    bg = "#7b3f00"
+    highlight_bg = "#f9ad3b"
+    urgent_bg = "#fc0202"
+    text = "#d8d6d4"
+    inactive_text = "#897a68"
+    border_focus = "#354ae8"
+    highlight_text = "#b7afa5"
 
-
-class Commands:
-    search = "firefox"
-    terminal = "alacritty"
-    volume_up = "amixer -q -c 0 sset Master 5dB+"
-    volume_down = "amixer -q -c 0 sset Master 5dB-"
-    audio_toggle = "python3 -q {}audio.py toggle".format(SYSTEM_PATH)
-    menu = "python3 -q {}kisspy_menu.py".format(SYSTEM_PATH)
-
-command = Commands()
 
 def make_correct(string, length, suffix="", filler="0"):
     difference = length-len(string)
@@ -196,8 +217,33 @@ def get_datetime():
     return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
 def get_everything(*args):
-    return mem.get_memusage() + cpu.get_cpuusage()
+    # return result
+    return mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
 
+def open_terminal(command, hold=False, direct=False):
+    """Open a terminal to run a command"""
+    sh_command_file = os.path.expanduser("~/.dmenuEextended_shellCommand.sh");
+    with open(sh_command_file, 'w') as f:
+        f.write("#! /bin/bash\n")
+        f.write(command + ";\n")
+
+        if hold == True:
+            f.write('echo "\n\nPress enter to exit";')
+            f.write('read var;')
+
+    os.chmod(os.path.expanduser(sh_command_file), 0o744)
+    os.system(programs["terminal"] + ' -e ' + sh_command_file)
+
+def test_lol(res):
+    # global result
+    try:
+        # open_terminal(res)
+        os.system("python3 -q /home/irreq/github/config/qtile/test.py {}".format(res))
+        # os.system(res)
+        # result = str(res)
+    except Exception as e:
+        pass
+    return
 
 class CustomBaseTextBox(BaseTextBox):
     defaults = [
@@ -287,10 +333,12 @@ hook.subscribe.hooks.add("prompt_unfocus")
 
 class SuggestionPrompt(widget.Prompt):
 
-    max_suggestions = 100
+    max_suggestions = 10
     available = []
     current_query = programs
     chosen = ""
+
+    separator = " "
 
     def startInput(self, *a, **kw):  # noqa: N802
         hook.fire('prompt_focus')
@@ -344,7 +392,7 @@ class SuggestionPrompt(widget.Prompt):
             self.text = self.display + self.text
 
             if self.available:
-                self.text += " | " + " ".join(self.available[:self.max_suggestions]) + " | "
+                self.text += " | " + f"{self.separator}".join(self.available[:self.max_suggestions]) + " | "
 
         else:
             self.text = ""
@@ -361,9 +409,17 @@ class SuggestionPrompt(widget.Prompt):
                     tmp = tmp.replace("QUERY", "+".join(separate[1:]))
                 else:
                     tmp += " "+" ".join(separate[1:])
+
+                if "sudo" in tmp:
+                    tmp = "{} | {}".format(self.current_query["terminal"], tmp)
             self.user_input = tmp
 
-        super()._send_cmd()
+        # self.callback = test_lol
+
+        try:
+            super()._send_cmd()
+        except Exception:
+            self._unfocus()
 
     def _cursor_to_left(self):
         # Move cursor to left, if possible
@@ -380,6 +436,38 @@ class SuggestionPrompt(widget.Prompt):
             self.cursor_position += 1
         else:
             self._alert()
+
+
+class BrowseablePrompt():
+
+    def __init__(self, *args, arguments={"Empty": "echo Empty"}, n_suggestions=42, **kwargs):
+        self._args = args
+        self._arguments = arguments
+        self._n_suggestions = n_suggestions
+        self._kwargs = kwargs
+
+        self.clear()
+
+    def clear(self):
+        self.position = None
+        self.cursor_position = 0
+        self.available = ""
+        self.user_input = ""
+        self.archived_input = ""
+
+    def main(self):
+        pass
+
+    def exec_cmd(self):
+        pass
+
+    def move_right(self):
+        pass
+
+    def move_left(self):
+        pass
+
+
 
 
 class CustomWindowName(widget.WindowName):
@@ -435,16 +523,14 @@ def user_keymap(mod, shift, control, alt):
     yield mod + control + "k", lazy.layout.grow_up()
     yield mod + control + "l", lazy.layout.grow_right()
 
-
     # Audio
-    yield mod + "comma", lazy.spawn(command.volume_down)
-    yield mod + "period", lazy.spawn(command.volume_up)
-    yield mod + "minus", lazy.spawn(command.audio_toggle)
+    yield mod + "comma", lazy.spawn(programs["vol_down"])
+    yield mod + "period", lazy.spawn(programs["vol_up"])
+    yield mod + "minus", lazy.spawn(programs["pause"])
 
     # Start stuff
-    yield mod + "o", lazy.spawncmd() # Run a command
-    yield mod + "Return", lazy.spawn(command.terminal)
-    yield mod + "y", lazy.spawn(command.search) # As in "why" lol
+    yield mod + "o", lazy.spawncmd() # Open menu
+    yield mod + "Return", lazy.spawn(programs["terminal"])
     yield mod + "p", lazy.window.toggle_fullscreen()
 
     # Stop stuff
@@ -494,20 +580,6 @@ def make_keymap(user_map):
 
 keys = make_keymap(user_keymap)
 
-
-class ColorScheme:
-    bg = "#282828"
-    highlight_bg = "#888888"
-    urgent_bg = "#e336e9"
-
-    text = "#ffffff"
-    inactive_text = "#700a74"
-
-    border = "#333333"
-    border_focus = urgent_bg
-    highlight_text = urgent_bg
-
-
 layouts = [
     layout.Columns(border_focus_stack=0, border_width=0),
 ]
@@ -521,7 +593,7 @@ widget_defaults = dict(
     margin=0,
     margin_x=0,
     margin_y=0,
-    foreground=ColorScheme.text,
+    foreground=Colors.text,
     center_aligned=True,
     markup=False,
 )
@@ -529,10 +601,10 @@ widget_defaults = dict(
 
 def create_widgets():
     yield SuggestionPrompt(
-        prompt=": ",
-        padding=10,
-        foreground=ColorScheme.highlight_text,
-        cursor_color=ColorScheme.highlight_text,
+        prompt=" ",
+        padding=2,
+        foreground=Colors.highlight_text,
+        cursor_color=Colors.highlight_text,
     )
     yield widget.GroupBox(
         disable_drag=True,
@@ -545,10 +617,10 @@ def create_widgets():
         highlight_method="block",
         urgent_alert_method="block",
         rounded=False,
-        active=ColorScheme.text,
-        inactive=ColorScheme.inactive_text,
-        urgent_border=ColorScheme.urgent_bg,
-        this_current_screen_border=ColorScheme.highlight_bg,
+        active=Colors.text,
+        inactive=Colors.inactive_text,
+        urgent_border=Colors.urgent_bg,
+        this_current_screen_border=Colors.highlight_bg,
         fontsize=FONTSIZE,
         font=FONT,
     )
@@ -557,21 +629,8 @@ def create_widgets():
     )
     yield DisplayOutputFromFunctionEverySecond(
         function=get_everything,
-        active_color=ColorScheme.highlight_text,
-        inactive_color=ColorScheme.inactive_text,
-    )
-    yield widget.Clock(
-        format="%e %a",
-        foreground=ColorScheme.inactive_text,
-        font=FONT,
-        update_interval=60,
-        padding=2,
-    )
-    yield widget.Clock(
-        format="%H:%M:%S",
-        foreground=ColorScheme.text,
-        font=FONT,
-        padding=2,
+        active_color=Colors.highlight_text,
+        inactive_color=Colors.inactive_text,
     )
 
 
@@ -580,7 +639,7 @@ screens = [
         bottom=bar.Bar(
             list(create_widgets()),
             FONTSIZE+6, # bar height
-            background=ColorScheme.bg,
+            background=Colors.bg,
         ),
     ),
 ]
@@ -594,8 +653,4 @@ bring_front_click = True
 cursor_warp = False
 auto_fullscreen = True
 focus_on_window_activation = "urgent"
-@hook.subscribe.startup_once
-def start_once():
-    for i in ["keyboard", "screen", "atom", "firefox"]:
-        lazy.spawn(programs[i])
 wmname = "LG3D"
