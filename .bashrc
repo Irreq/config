@@ -143,7 +143,7 @@ alias cls='clear'
 # for flatpak:
 alias teams='flatpak run com.microsoft.Teams'
 alias discord='flatpak run com.discordapp.Discord'
-
+alias atom='flatpak run io.atom.Atom'
 
 #alias sam='./home/irreq/Programs/sam'
 source "$HOME/.cargo/env"

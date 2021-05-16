@@ -16,7 +16,7 @@
 # - Little to no automation, you must specifically edit the programs in 'programs'
 # - No mouse (But if you are reading this, you probably know how to navigate using a keyboard)
 
-import os
+import subprocess
 
 from datetime import datetime
 from fnmatch import fnmatch
@@ -27,11 +27,10 @@ from libqtile.config import Group, Key, Screen
 from libqtile.widget.base import ORIENTATION_HORIZONTAL
 from libqtile.widget.base import _TextBox as BaseTextBox
 
+
 MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
 FONTSIZE = 12
-
-result = "Hello, World!"
 
 programs = {
     # Programs
@@ -56,8 +55,8 @@ programs = {
     "shutdown": "sudo shutdown -h now",
 
     # Audio
-    "vol_up": "amixer -q -c 0 sset Master 5dB+",
-    "vol_down": "amixer -q -c 0 sset Master 5dB-",
+    "vol_up": "amixer -q -c 0 sset Headset 5dB+",
+    "vol_down": "amixer -q -c 0 sset Headset 5dB-",
     "pause": "python3 -q /home/irreq/github/config/audio.py toggle",
     "pavucontrol": "pavucontrol",
     "spotify": "spotify -no-zygote",
@@ -70,12 +69,13 @@ programs = {
     "terminal": "alacritty",
     "keyboard": "setxkbmap se",
     "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
-    #"screen": "xrandr --output VGA-1 --off --output LVDS-1 --off --output HDMI-1 --mode 1920x1200 --pos 0x0 --rotate normal",
-    "screen": "xrandr --output HDMI-1 --off --output LVDS-1 --off --output VGA-1 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_hdmi": "xrandr --output VGA-1 --off --output LVDS-1 --off --output HDMI-1 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_vga": "xrandr --output HDMI-1 --off --output LVDS-1 --off --output VGA-1 --mode 1920x1200 --pos 0x0 --rotate normal",
 }
 
 class Colors:
-    bg = "#7b3f00"
+    # bg = "#7b3f00"
+    bg = "#24252b"
     highlight_bg = "#f9ad3b"
     urgent_bg = "#fc0202"
     text = "#d8d6d4"
@@ -100,7 +100,8 @@ class MemData():
     def _calc_mem_values(self, mem_values):
         """Calculate: total memory, used memory and percentage"""
         total = mem_values["MemTotal:"]
-        used = mem_values["MemTotal:"] - mem_values["MemAvailable:"]
+        # used = mem_values["MemTotal:"] - mem_values["MemAvailable:"]
+        used = mem_values["MemTotal:"] - (mem_values['MemFree:'] + mem_values['Buffers:'] + mem_values['Cached:'])
         percentage = used / total * 1e8
         return [round(i / 1e6, 2) for i in [total, used, percentage]]
 
@@ -109,7 +110,8 @@ class MemData():
 
     def get_memusage(self):
         result_mem = self.main()
-        used = make_correct(str(result_mem[1]), 4, suffix="GB")
+        # used = make_correct(str(result_mem[1]), 4, suffix="GB")
+        used = str(result_mem[1])
         mem_percentage = make_correct(str(int(result_mem[2])), 2, suffix="%")
         return " MEM: {} {}".format(used, mem_percentage)
 
@@ -217,33 +219,8 @@ def get_datetime():
     return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
 def get_everything(*args):
-    # return result
     return mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
 
-def open_terminal(command, hold=False, direct=False):
-    """Open a terminal to run a command"""
-    sh_command_file = os.path.expanduser("~/.dmenuEextended_shellCommand.sh");
-    with open(sh_command_file, 'w') as f:
-        f.write("#! /bin/bash\n")
-        f.write(command + ";\n")
-
-        if hold == True:
-            f.write('echo "\n\nPress enter to exit";')
-            f.write('read var;')
-
-    os.chmod(os.path.expanduser(sh_command_file), 0o744)
-    os.system(programs["terminal"] + ' -e ' + sh_command_file)
-
-def test_lol(res):
-    # global result
-    try:
-        # open_terminal(res)
-        os.system("python3 -q /home/irreq/github/config/qtile/test.py {}".format(res))
-        # os.system(res)
-        # result = str(res)
-    except Exception as e:
-        pass
-    return
 
 class CustomBaseTextBox(BaseTextBox):
     defaults = [
@@ -438,38 +415,6 @@ class SuggestionPrompt(widget.Prompt):
             self._alert()
 
 
-class BrowseablePrompt():
-
-    def __init__(self, *args, arguments={"Empty": "echo Empty"}, n_suggestions=42, **kwargs):
-        self._args = args
-        self._arguments = arguments
-        self._n_suggestions = n_suggestions
-        self._kwargs = kwargs
-
-        self.clear()
-
-    def clear(self):
-        self.position = None
-        self.cursor_position = 0
-        self.available = ""
-        self.user_input = ""
-        self.archived_input = ""
-
-    def main(self):
-        pass
-
-    def exec_cmd(self):
-        pass
-
-    def move_right(self):
-        pass
-
-    def move_left(self):
-        pass
-
-
-
-
 class CustomWindowName(widget.WindowName):
     def __init__(self, *a, **kw):
         super().__init__(*a, **kw)
@@ -496,9 +441,7 @@ class CustomWindowName(widget.WindowName):
             self.bar.draw()
 
 
-groups = []
-for gname in "asdfg":
-    groups.append(Group(gname, label=gname.upper()))
+groups = [Group(gname, label=gname.upper()) for gname in "asdfg"]
 
 def user_keymap(mod, shift, control, alt):
     for g in groups:
@@ -601,7 +544,7 @@ widget_defaults = dict(
 
 def create_widgets():
     yield SuggestionPrompt(
-        prompt=" ",
+        prompt=" > ",
         padding=2,
         foreground=Colors.highlight_text,
         cursor_color=Colors.highlight_text,
@@ -638,7 +581,7 @@ screens = [
     Screen(
         bottom=bar.Bar(
             list(create_widgets()),
-            FONTSIZE+6, # bar height
+            FONTSIZE+3, # bar height
             background=Colors.bg,
         ),
     ),
