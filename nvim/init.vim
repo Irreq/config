@@ -29,11 +29,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'jistr/vim-nerdtree-tabs'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
-Plug 'https://github.com/joshdick/onedark.vim.git'
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'airblade/vim-gitgutter'
 Plug 'vim-scripts/grep.vim'
 Plug 'vim-scripts/CSApprox'
 Plug 'bronson/vim-trailing-whitespace'
@@ -43,8 +39,7 @@ Plug 'scrooloose/syntastic'
 Plug 'Yggdroot/indentLine'
 Plug 'avelino/vim-bootstrap-updater'
 Plug 'vim-python/python-syntax'
-
-""let g:python_highlight_all = 1
+Plug 'iamcco/markdown-preview.vim'
 
 let g:make = 'gmake'
 if exists('make')
@@ -68,9 +63,6 @@ endif
 
 Plug 'honza/vim-snippets'
 
-"" Color
-Plug 'tomasr/molokai'
-
 "*****************************************************************************
 "" Custom bundles
 "*****************************************************************************
@@ -84,10 +76,6 @@ Plug 'jelera/vim-javascript-syntax'
 "" Python Bundle
 Plug 'davidhalter/jedi-vim'
 
-
-"*****************************************************************************
-"*****************************************************************************
-
 "" Include user's extra bundle
 if filereadable(expand("~/.config/nvimrc.local.bundles"))
   source ~/.config/nvimrc.local.bundles
@@ -98,6 +86,37 @@ call plug#end()
 " Required:
 filetype plugin indent on
 
+let g:mkdp_path_to_chrome = "/usr/bin/firefox"
+    " Path to the chrome or the command to open chrome (or other modern browsers).
+    " If set, g:mkdp_browserfunc would be ignored.
+
+let g:mkdp_browserfunc = 'MKDP_browserfunc_default'
+" Callback Vim function to open browser, the only parameter is the url to open.
+
+let g:mkdp_auto_start = 0
+" Set to 1, Vim will open the preview window on entering the Markdown
+    " buffer.
+
+let g:mkdp_auto_open = 0
+" Set to 1, Vim will automatically open the preview window when you edit a
+    " Markdown file.
+
+let g:mkdp_auto_close = 1
+" Set to 1, Vim will automatically close the current preview window when
+" switching from one Markdown buffer to another.
+
+let g:mkdp_refresh_slow = 0
+" Set to 1, Vim will just refresh Markdown when saving the buffer or
+" leaving from insert mode. With default 0, it will automatically refresh
+" Markdown as you edit or move the cursor.
+
+let g:mkdp_command_for_global = 0
+" Set to 1, the MarkdownPreview command can be used for all files,
+" by default it can only be used in Markdown files.
+
+let g:mkdp_open_to_the_world = 0
+" Set to 1, the preview server will be available to others in your network.
+" By default, the server only listens on localhost (127.0.0.1).
 
 
 "*****************************************************************************
@@ -146,6 +165,7 @@ let g:session_autoload = "no"
 let g:session_autosave = "no"
 let g:session_command_aliases = 1
 
+
 "*****************************************************************************
 "" Visual Settings
 "*****************************************************************************
@@ -153,153 +173,11 @@ syntax on
 set ruler
 set number
 
-
-
-""##############################################
-if (has("autocmd") && !has("gui_running"))
-  augroup colorset
-    autocmd!
-    let s:black = { "gui": "#000000", "cterm": "145", "cterm16" : "0" }
-    let s:red = { "gui": "#960000", "cterm": "145", "cterm16" : "1" }
-    let s:green = { "gui": "#248902", "cterm": "145", "cterm16" : "2" }
-    let s:yellow = { "gui": "#fc8414", "cterm": "145", "cterm16" : "3" }
-    let s:blue = { "gui": "#1459fc", "cterm": "145", "cterm16" : "4" }
-    let s:magenta = { "gui": "#75507b", "cterm": "145", "cterm16" : "5" }
-    let s:cyan = { "gui": "#06989a", "cterm": "145", "cterm16" : "6" }
-    let s:white = { "gui": "#d3d7cf", "cterm": "145", "cterm16" : "7" }
-
-    let s:black = { "gui": "#555753", "cterm": "145", "cterm16" : "8" }
-    let s:red = { "gui": "#ff0000", "cterm": "145", "cterm16" : "9" }
-    let s:green = { "gui": "#22d81c", "cterm": "145", "cterm16" : "10" }
-    let s:yellow = { "gui": "#ffff00", "cterm": "145", "cterm16" : "11" }
-    let s:blue = { "gui": "#32afff", "cterm": "145", "cterm16" : "12" }
-    let s:magenta = { "gui": "#ad7fa8", "cterm": "145", "cterm16" : "13" }
-    let s:cyan = { "gui": "#34e2e2", "cterm": "145", "cterm16" : "14" }
-    let s:white = { "gui": "#ffffff", "cterm": "145", "cterm16" : "15" }
-
-    ""autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
-  augroup END
-endif
-
-
-let no_buffers_menu=1
-if !exists('g:not_finish_vimplug')
-  colorscheme onedark
-endif
-
-let s:black = { "gui": "#000000", "cterm": "145", "cterm16" : "0" }
-let s:red = { "gui": "#960000", "cterm": "145", "cterm16" : "1" }
-let s:green = { "gui": "#248902", "cterm": "145", "cterm16" : "2" }
-let s:yellow = { "gui": "#fc8414", "cterm": "145", "cterm16" : "3" }
-let s:blue = { "gui": "#1459fc", "cterm": "145", "cterm16" : "4" }
-let s:magenta = { "gui": "#75507b", "cterm": "145", "cterm16" : "5" }
-let s:cyan = { "gui": "#06989a", "cterm": "145", "cterm16" : "6" }
-let s:white = { "gui": "#d3d7cf", "cterm": "145", "cterm16" : "7" }
-
-let s:black = { "gui": "#555753", "cterm": "145", "cterm16" : "8" }
-let s:red = { "gui": "#ff0000", "cterm": "145", "cterm16" : "9" }
-let s:green = { "gui": "#22d81c", "cterm": "145", "cterm16" : "10" }
-let s:yellow = { "gui": "#ffff00", "cterm": "145", "cterm16" : "11" }
-let s:blue = { "gui": "#32afff", "cterm": "145", "cterm16" : "12" }
-let s:magenta = { "gui": "#ad7fa8", "cterm": "145", "cterm16" : "13" }
-let s:cyan = { "gui": "#34e2e2", "cterm": "145", "cterm16" : "14" }
-let s:white = { "gui": "#ffffff", "cterm": "145", "cterm16" : "15" }
-
-""hi Red1d guifg=#8f0000
-""hi Red2d guifg=#702020
-""hi Red3d guifg=#500707
-""hi Red1p guifg=#fa4740
-""hi Red2p guifg=#f08787
-""hi Red3p guifg=#f0a787
-""
-""hi Blue1d guifg=#1010f0
-""hi Blue2d guifg=#101090
-""hi Blue3d guifg=#103050
-""hi Blue1p guifg=#8080f0
-""hi Blue2p guifg=#a080f0
-""hi Blue3p guifg=#70a0f0
-""
-""hi Green1d guifg=#01a001
-""hi Green2d guifg=#017001
-""hi Green3d guifg=#015001
-""hi Green1p guifg=#a0f0a0
-""hi Green2p guifg=#c0ffa0
-""hi Green3p guifg=#c0f010
-""
-""hi Yellow1p guifg=#f0f000
-""hi Yellow2p guifg=#fafa0a
-""hi Yellow3p guifg=#fdda0a
-""hi Yellow1d guifg=#adaa0a
-""hi Yellow2d guifg=#8a8a01
-""hi Yellow3d guifg=#4a4a01
-
-set mousemodel=popup
-set t_Co=256
-set guioptions=egmrti
-set gfn=Monospace\ 10
-
-if has("gui_running")
-  if has("gui_mac") || has("gui_macvim")
-    set guifont=Menlo:h12
-    set transparency=7
-  endif
-else
-  let g:CSApprox_loaded = 1
-
-  " IndentLine
-  let g:indentLine_enabled = 1
-  let g:indentLine_concealcursor = 0
-  let g:indentLine_char = '┆'
-  let g:indentLine_faster = 1
-
-
-endif
-
-
-
-"" Disable the blinking cursor.
-set gcr=a:blinkon0
-set scrolloff=3
-
-"" Status bar
-set laststatus=2
-
-"" Use modeline overrides
-set modeline
-set modelines=10
-
-set title
-set titleold="Terminal"
-set titlestring=%F
-
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\
 
-if exists("*fugitive#statusline")
-  set statusline+=%{fugitive#statusline()}
-endif
-
-" vim-airline
-let g:airline_theme = 'powerlineish'
-let g:airline#extensions#syntastic#enabled = 1
-let g:airline#extensions#branch#enabled = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tagbar#enabled = 1
-let g:airline_skip_empty_sections = 1
-
 "*****************************************************************************
-"" Abbreviations
+"" Random Config
 "*****************************************************************************
-"" no one is really happy until you have this shortcuts
-cnoreabbrev W! w!
-cnoreabbrev Q! q!
-cnoreabbrev Qall! qall!
-cnoreabbrev Wq wq
-cnoreabbrev Wa wa
-cnoreabbrev wQ wq
-cnoreabbrev WQ wq
-cnoreabbrev W w
-cnoreabbrev Q q
-cnoreabbrev Qall qall
 
 "" NERDTree configuration
 let g:NERDTreeChDirMode=2
@@ -313,22 +191,6 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
 nnoremap <silent> <F2> :NERDTreeFind<CR>
 noremap <F3> :NERDTreeToggle<CR>
 
-" grep.vim
-nnoremap <silent> <leader>f :Rgrep<CR>
-let Grep_Default_Options = '-IR'
-let Grep_Skip_Files = '*.log *.db'
-let Grep_Skip_Dirs = '.git node_modules'
-
-" vimshell.vim
-let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
-let g:vimshell_prompt =  '$ '
-
-" terminal emulation
-if g:vim_bootstrap_editor == 'nvim'
-  nnoremap <silent> <leader>sh :terminal<CR>
-else
-  nnoremap <silent> <leader>sh :VimShellCreate<CR>
-endif
 
 "*****************************************************************************
 "" Functions
@@ -521,95 +383,135 @@ augroup vimrc-python
       \ cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 augroup END
 
-" jedi-vim
-let g:jedi#popup_on_dot = 0
-let g:jedi#goto_assignments_command = "<leader>g"
-let g:jedi#goto_definitions_command = "<leader>d"
-let g:jedi#documentation_command = "K"
-let g:jedi#usages_command = "<leader>n"
-let g:jedi#rename_command = "<leader>r"
-let g:jedi#show_call_signatures = "0"
-let g:jedi#completions_command = "<C-Space>"
-let g:jedi#smart_auto_mappings = 0
-
 " syntastic
 let g:syntastic_python_checkers=['python', 'flake8']
 
-" vim-airline
-let g:airline#extensions#virtualenv#enabled = 1
-
-
-"*****************************************************************************
-"*****************************************************************************
-
-"" Include user's local vim config
-if filereadable(expand("~/.config/nvimrc.local"))
-  source ~/.config/nvimrc.local
-endif
-
-"*****************************************************************************
-"" Convenience variables
-"*****************************************************************************
-
-" vim-airline
-if !exists('g:airline_symbols')
-  let g:airline_symbols = {}
-endif
-
-if !exists('g:airline_powerline_fonts')
-  let g:airline#extensions#tabline#left_sep = ' '
-  let g:airline#extensions#tabline#left_alt_sep = '|'
-  let g:airline_left_sep          = '▶'
-  let g:airline_left_alt_sep      = '»'
-  let g:airline_right_sep         = '◀'
-  let g:airline_right_alt_sep     = '«'
-  let g:airline#extensions#branch#prefix     = '⤴' "➔, ➥, ⎇
-  let g:airline#extensions#readonly#symbol   = '⊘'
-  let g:airline#extensions#linecolumn#prefix = '¶'
-  let g:airline#extensions#paste#symbol      = 'ρ'
-  let g:airline_symbols.linenr    = '␊'
-  let g:airline_symbols.branch    = '⎇'
-  let g:airline_symbols.paste     = 'ρ'
-  let g:airline_symbols.paste     = 'Þ'
-  let g:airline_symbols.paste     = '∥'
-  let g:airline_symbols.whitespace = 'Ξ'
-else
-  let g:airline#extensions#tabline#left_sep = ''
-  let g:airline#extensions#tabline#left_alt_sep = ''
-
-  " powerline symbols
-  let g:airline_left_sep = ''
-  let g:airline_left_alt_sep = ''
-  let g:airline_right_sep = ''
-  let g:airline_right_alt_sep = ''
-  let g:airline_symbols.branch = ''
-  let g:airline_symbols.readonly = ''
-  let g:airline_symbols.linenr = ''
-endif
-
-set t_Co=16
-syntax enable                   "Use syntax highlighting
-let g:airline#extensions#tabline#enabled = 1
-
-"" set default identation
-set tabstop=4
-set shiftwidth=4
-set expandtab
-set laststatus=2
-
-"" set shortcut for open Nerdtree
-map <C-n> :NERDTreeToggle<CR>
-
 syntax on
-"" Turn-on onedark color scheme
-" color onedark
-
-" make vim look like terminal
 set termguicolors
 
 "" ctrlP key for ctrlP plugin
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
 
+"" set shortcut for open Nerdtree
+map <C-n> :NERDTreeToggle<CR>
+
 "" Make Nerdtree show .files by default
 let NERDTreeShowHidden=1
+
+
+
+
+
+
+
+
+
+set background=dark
+hi clear
+
+if exists('syntax on')
+    syntax reset
+endif
+
+let g:colors_name='WhyDoWeNeedAName'
+set t_Co=256
+
+
+
+" misc
+
+hi ColorColumn      guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Conceal          guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Cursor           guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi lCursor          guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi CursorIM         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi CursorColumn     guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi CursorLine       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Directory        guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi DiffAdd          guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi DiffChange       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi DiffDelete       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi DiffText         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi EndOfBuffer      guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi ErrorMsg         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi VertSplit        guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Folded           guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi FoldColumn       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi SignColumn       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi IncSearch        guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi LineNr           guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi LineNrAbove      guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi LineNrBelow      guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi CursorLineNr     guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi MatchParen       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi ModeMsg          guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi MoreMsg          guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi NonText          guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Pmenu            guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi PmenuSel         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi PmenuSbar        guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi PmenuThumb       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Question         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi QuickFixLine     guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Search           guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi SpecialKey       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi SpellBad         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi SpellCap         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi SpellLocal       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi SpellRare        guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi StatusLine       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi StatusLineNC     guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi StatusLineTerm   guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi StatusLineTermNC guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi TabLine          guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi TabLineFill      guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi TabLineSel       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Terminal         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Title            guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Visual           guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi VisualNOS        guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi WarningMsg       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi WildMenu         guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+
+" major
+
+hi Normal     guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Comment    guisp=NONE guifg=#555753 guibg=#282828 ctermfg=240 ctermbg=234 gui=NONE cterm=NONE
+hi Constant   guisp=NONE guifg=#ffe70d guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Identifier guisp=NONE guifg=#1d1de0 guibg=#282828 ctermfg=20  ctermbg=234 gui=NONE cterm=NONE
+hi Statement  guisp=NONE guifg=#fd55ff guibg=#282828 ctermfg=200 ctermbg=234 gui=NONE cterm=NONE
+hi PreProc    guisp=NONE guifg=#3b41ff guibg=#282828 ctermfg=63  ctermbg=234 gui=NONE cterm=NONE
+hi Type       guisp=NONE guifg=#37e637 guibg=#282828 ctermfg=77  ctermbg=234 gui=NONE cterm=NONE
+hi Special    guisp=NONE guifg=#00eeff guibg=#282828 ctermfg=51  ctermbg=234 gui=NONE cterm=NONE
+hi Underlined guisp=NONE guifg=#ff9c12 guibg=#282828 ctermfg=214 ctermbg=234 gui=NONE cterm=NONE
+hi Ignore     guisp=NONE guifg=#ff1919 guibg=#282828 ctermfg=196 ctermbg=234 gui=NONE cterm=NONE
+hi Error      guisp=NONE guifg=#ff0000 guibg=#282828 ctermfg=196 ctermbg=234 gui=NONE cterm=NONE
+hi Todo       guisp=NONE guifg=#a39393 guibg=#282828 ctermfg=246 ctermbg=234 gui=NONE cterm=NONE
+
+" minor
+""source $MYVIMRC
+hi String         guisp=NONE guifg=#22d81c guibg=#282828 ctermfg=40  ctermbg=234 gui=NONE cterm=NONE
+hi Character      guisp=NONE guifg=#ff0000 guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Number         guisp=NONE guifg=#fc8414 guibg=#282828 ctermfg=208 ctermbg=234 gui=NONE cterm=NONE
+hi Boolean        guisp=NONE guifg=#fc8414 guibg=#282828 ctermfg=208 ctermbg=234 gui=NONE cterm=NONE
+hi Float          guisp=NONE guifg=#fc8414 guibg=#282828 ctermfg=208 ctermbg=234 gui=NONE cterm=NONE
+hi Function       guisp=NONE guifg=#32afff guibg=#282828 ctermfg=75  ctermbg=234 gui=NONE cterm=NONE
+hi Conditional    guisp=NONE guifg=#fd55ff guibg=#282828 ctermfg=30  ctermbg=234 gui=NONE cterm=NONE
+hi Repeat         guisp=NONE guifg=#fd55ff guibg=#282828 ctermfg=207 ctermbg=234 gui=NONE cterm=NONE
+hi Label          guisp=NONE guifg=#0000ff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Operator       guisp=NONE guifg=#ff0000 guibg=#282828 ctermfg=196 ctermbg=234 gui=NONE cterm=NONE
+hi Keyword        guisp=NONE guifg=#0000ff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Exception      guisp=NONE guifg=#ff0000 guibg=#282828 ctermfg=196 ctermbg=234 gui=NONE cterm=NONE
+hi Include        guisp=NONE guifg=#fd55ff guibg=#282828 ctermfg=207 ctermbg=234 gui=NONE cterm=NONE
+hi Define         guisp=NONE guifg=#34e2e2 guibg=#282828 ctermfg=80  ctermbg=234 gui=NONE cterm=NONE
+hi Macro          guisp=NONE guifg=#123456 guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi PreCondit      guisp=NONE guifg=#123456 guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi StorageClass   guisp=NONE guifg=#ff0000 guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Structure      guisp=NONE guifg=#ffe70d guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Typedef        guisp=NONE guifg=#bfff00 guibg=#282828 ctermfg=154 ctermbg=234 gui=NONE cterm=NONE
+hi SpecialChar    guisp=NONE guifg=#0000ff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Tag            guisp=NONE guifg=#0000ff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi Delimiter      guisp=NONE guifg=#0000ff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi SpecialComment guisp=NONE guifg=#ffe70d guibg=#282828 ctermfg=220 ctermbg=234 gui=NONE cterm=NONE
+hi Debug          guisp=NONE guifg=#00ff00 guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE

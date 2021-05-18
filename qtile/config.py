@@ -74,14 +74,13 @@ programs = {
 }
 
 class Colors:
-    # bg = "#7b3f00"
-    bg = "#24252b"
-    highlight_bg = "#f9ad3b"
-    urgent_bg = "#fc0202"
-    text = "#d8d6d4"
-    inactive_text = "#897a68"
+    bg = "#282828"
+    highlight_bg = "#248902"
+    urgent_bg = "#ff0000"
+    text = "#ffffff"
+    inactive_text = "#555753"
     border_focus = "#354ae8"
-    highlight_text = "#b7afa5"
+    highlight_text = "#d3d7cf"
 
 
 def make_correct(string, length, suffix="", filler="0"):
@@ -99,29 +98,41 @@ class MemData():
 
     def _calc_mem_values(self, mem_values):
         """Calculate: total memory, used memory and percentage"""
+
+        # From 'htop'
+        # Total used memory = MemTotal - MemFree
+        # Non cache/buffer memory (green) = Total used memory - (Buffers + Cached memory)
+        # Buffers (blue) = Buffers
+        # Cached memory (yellow) = Cached + SReclaimable - Shmem
+        # Swap = SwapTotal - SwapFree
         total = mem_values["MemTotal:"]
-        # used = mem_values["MemTotal:"] - mem_values["MemAvailable:"]
-        used = mem_values["MemTotal:"] - (mem_values['MemFree:'] + mem_values['Buffers:'] + mem_values['Cached:'])
-        percentage = used / total * 1e8
-        return [round(i / 1e6, 2) for i in [total, used, percentage]]
+
+        used = total - mem_values['MemFree:'] - (mem_values['Buffers:'] + (mem_values['Cached:'] + mem_values['SReclaimable:'] - mem_values['Shmem:']))
+
+        # 2^20 = 1048576
+        result = [int(i/1048576*100)/100 for i in (total, used)]
+
+        result.append(int(used / total * 100))
+
+        return result
 
     def main(self):
         return self._calc_mem_values(self._get_meminfo())
 
     def get_memusage(self):
         result_mem = self.main()
-        # used = make_correct(str(result_mem[1]), 4, suffix="GB")
         used = str(result_mem[1])
-        mem_percentage = make_correct(str(int(result_mem[2])), 2, suffix="%")
-        return " MEM: {} {}".format(used, mem_percentage)
+        percentage = str(result_mem[2])
+        return " MEM: {}GB {}%".format(used, percentage)
 
 
 class SysData():
     def __init__(self):
         self.path = "/proc/cpuinfo"
         self.stat = "/proc/stat"
-
+        # temperature = cat /sys/class/thermal/thermal_zone*/temp
         self.cpus = dict()
+        self.temp = 0
 
         self.refresh()
 
@@ -136,6 +147,14 @@ class SysData():
         for local_filter in self.cpus["cpus"]:
             if fnmatch(cpu_name, local_filter):
                 self.cpus["list"].append(cpu_name)
+
+
+    def _get_tempinfo(self):
+        # Fix this as it is hardcoded to work only for thermal_zone0 and
+        # that could be anything on a multisensor system.
+        with open(r"/sys/class/thermal/thermal_zone0/temp", "r") as f:
+            temp = [i.split("\n")[0] for i in f][0]
+            return str(int(float(temp) / 1e3))
 
     def _get_cpuinfo(self):
         with open(self.path, "r") as f:
@@ -203,13 +222,18 @@ class SysData():
 
         core_usage = self._calc_cpu_percent_wrapper()
 
-        return [low, mean, high, core_usage]
+        temperature = self._get_tempinfo()
+
+        return [low, mean, high, core_usage, temperature]
 
     def get_cpuusage(self):
         result_cpu = self.main()
-        speed = make_correct(str(result_cpu[1]), 4, suffix="GHz")
-        cpu_percentage = str(int(sum(result_cpu[3])/len(result_cpu[3])))+"%"
-        return " CPU: {} {}".format(speed, cpu_percentage)
+        speed = make_correct(str(result_cpu[1]), 4)
+        cpu_percentage = str(int(sum(result_cpu[3])/len(result_cpu[3])))
+        temperature = result_cpu[4]
+        # Do we seriously need the CPU-frequency?
+        # return " CPU: {}GHz {}% {}°C".format(speed, cpu_percentage, temperature)
+        return " CPU: {}°C {}%".format(temperature, cpu_percentage)
 
 
 cpu = SysData()
@@ -551,6 +575,7 @@ def create_widgets():
     )
     yield widget.GroupBox(
         disable_drag=True,
+        hide_unused=True,
         use_mouse_wheel=False,
         padding_x=4,
         padding_y=0,
@@ -559,7 +584,7 @@ def create_widgets():
         borderwidth=0,
         highlight_method="block",
         urgent_alert_method="block",
-        rounded=False,
+        rounded=True,
         active=Colors.text,
         inactive=Colors.inactive_text,
         urgent_border=Colors.urgent_bg,
@@ -581,7 +606,7 @@ screens = [
     Screen(
         bottom=bar.Bar(
             list(create_widgets()),
-            FONTSIZE+3, # bar height
+            FONTSIZE+0, # bar height
             background=Colors.bg,
         ),
     ),
@@ -591,9 +616,9 @@ screens = [
 dgroups_key_binder = None
 dgroups_app_rules = []
 main = None
-follow_mouse_focus = False
-bring_front_click = True
-cursor_warp = False
+follow_mouse_focus = True
+# bring_front_click = True
+cursor_warp = True
 auto_fullscreen = True
 focus_on_window_activation = "urgent"
 wmname = "LG3D"
