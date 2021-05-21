@@ -54,6 +54,8 @@ programs = {
     "reboot": "sudo reboot now",
     "shutdown": "sudo shutdown -h now",
 
+    "tester": "(alacritty &)",
+
     # Audio
     "vol_up": "amixer -q -c 0 sset Headset 5dB+",
     "vol_down": "amixer -q -c 0 sset Headset 5dB-",
@@ -246,6 +248,19 @@ def get_everything(*args):
     return mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
 
 
+def run_program(p):
+    try:
+        #commands = p.split()
+        commands = ["flatpak", "run", "com.discordapp.Discord"]
+        commands = ["alacritty", "|", "ls"]
+        subprocess.Popen(commands)
+        #subprocess.Popen(['ls', '-la'], shell=False)
+    except Exception:
+        pass
+
+    return
+
+
 class CustomBaseTextBox(BaseTextBox):
     defaults = [
         ("text_shift", 0, "Shift text vertically"),
@@ -415,8 +430,7 @@ class SuggestionPrompt(widget.Prompt):
                     tmp = "{} | {}".format(self.current_query["terminal"], tmp)
             self.user_input = tmp
 
-        # self.callback = test_lol
-
+        #self.callback = run_program
         try:
             super()._send_cmd()
         except Exception:
@@ -500,6 +514,7 @@ def user_keymap(mod, shift, control, alt):
     yield mod + "Return", lazy.spawn(programs["terminal"])
     yield mod + "p", lazy.window.toggle_fullscreen()
 
+    yield mod + "i", lazy.spawn("alacritty")
     # Stop stuff
     yield mod + shift + "q", lazy.window.kill()
     yield mod + shift + "r", lazy.restart()
@@ -611,6 +626,17 @@ screens = [
         ),
     ),
 ]
+
+
+@hook.subscribe.startup_once
+def autostart():
+    # Just add process name from programs here:
+    processes = ["keyboard"]
+
+    for p in processes:
+        commands = programs[p].split()
+        subprocess.Popen(commands)
+
 
 
 dgroups_key_binder = None
