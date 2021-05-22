@@ -134,7 +134,7 @@ esac
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx; fi
 
-alias github='cd ~/Desktop/Github'
+alias github='cd ~/github'
 alias spotify='spotify -no-zygote'
 alias thesaurus='firefox https://www.thesaurus.com/'
 alias youtube='firefox https://youtube.com'
