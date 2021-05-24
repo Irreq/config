@@ -77,7 +77,8 @@ else
     # PS1="🎅\[\e[33;41m\][\[\e[m\]\[\e[32m\]\u\[\e[m\]\[\e[36m\]@\[\e[m\]\[\e[34m\]\h\[\e[m\]\[\e[33;41m\]]\[\e[m\]🎄 "
     # PS1="[$red\u$nc@$red\H$nc]:$CYAN \W\$  "
     # PS1="\n[$PURPLE\u$nc@$CYAN\H$nc]→ $GREEN\w$nc\\n\n$GREENd$GREEN( ˘︶˘)っ$nc"
-    PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue → $PURPLE\w$RED]$nc$ "
+    # PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue → $PURPLE\w$RED]$nc$ "
+    PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue = $PURPLE\w$RED]$nc$ "
 fi
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -120,17 +121,6 @@ fi
 echo $PATH | grep -Eq "(^|:)/sbin(:|)"     || PATH=$PATH:/sbin
 echo $PATH | grep -Eq "(^|:)/usr/sbin(:|)" || PATH=$PATH:/usr/sbin
 
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
-
-
-
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx; fi
 
@@ -140,6 +130,15 @@ alias thesaurus='firefox https://www.thesaurus.com/'
 alias youtube='firefox https://youtube.com'
 alias cls='clear'
 
+
+# System
+alias update='sudo xbps-install -Su'
+alias install='sudo xbps-install -Su'
+alias remove='sudo xbps-remove -Oo'
+alias reboot='sudo reboot now'
+alias shutdown='sudo shutdown -h now'
+alias wifi='sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf'
+
 # for flatpak:
 alias teams='flatpak run com.microsoft.Teams'
 alias discord='flatpak run com.discordapp.Discord'
@@ -147,7 +146,8 @@ alias atom='flatpak run io.atom.Atom'
 
 #alias sam='./home/irreq/Programs/sam'
 source "$HOME/.cargo/env"
-source /home/irreq/alacritty/extra/completions/alacritty.bash
+source "$HOME/Programs/alacritty/extra/completions/alacritty.bash"
+#source /home/irreq/Programs/alacritty/extra/completions/alacritty.bash
 #source $HOME/.config/nvim/plug-config/rnvimr.vim
 export EDITOR='nvim'
 

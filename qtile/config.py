@@ -77,7 +77,7 @@ programs = {
 
 class Colors:
     bg = "#282828"
-    highlight_bg = "#248902"
+    highlight_bg = "#22d81c"
     urgent_bg = "#ff0000"
     text = "#ffffff"
     inactive_text = "#555753"
