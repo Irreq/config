@@ -637,7 +637,7 @@ screens = [
 @hook.subscribe.startup_once
 def autostart():
     # Just add process name from programs here:
-    processes = ["keyboard", "alacritty"]
+    processes = ["keyboard"]
 
     for p in processes:
         commands = programs[p].split()

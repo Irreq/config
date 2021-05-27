@@ -78,7 +78,7 @@ else
     # PS1="[$red\u$nc@$red\H$nc]:$CYAN \W\$  "
     # PS1="\n[$PURPLE\u$nc@$CYAN\H$nc]→ $GREEN\w$nc\\n\n$GREENd$GREEN( ˘︶˘)っ$nc"
     # PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue → $PURPLE\w$RED]$nc$ "
-    PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue = $PURPLE\w$RED]$nc$ "
+    PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue >> $PURPLE\w$RED]$nc$ "
 fi
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
