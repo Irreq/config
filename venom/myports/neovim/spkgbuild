@@ -1,0 +1,17 @@
+# description	: Vim-fork focused on extensibility and usability  
+# homepage	: https://veovim.io
+# depends	: cmake gcc
+
+name=neovim
+version=
+release=1
+noextract=""
+backup=""
+source=""
+
+build() {
+	cd $name-$version
+	./configure --prefix=/usr
+	make
+	make DESTDIR=$PKG install
+}
