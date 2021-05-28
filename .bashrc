@@ -140,9 +140,9 @@ alias shutdown='sudo shutdown -h now'
 alias wifi='sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf'
 
 # for flatpak:
-alias teams='flatpak run com.microsoft.Teams'
-alias discord='flatpak run com.discordapp.Discord'
-alias atom='flatpak run io.atom.Atom'
+#alias teams='flatpak run com.microsoft.Teams'
+#alias discord='flatpak run com.discordapp.Discord'
+#alias atom='flatpak run io.atom.Atom'
 
 #alias sam='./home/irreq/Programs/sam'
 #source "$HOME/.cargo/env"

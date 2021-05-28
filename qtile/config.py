@@ -35,7 +35,8 @@ FONTSIZE = 12
 programs = {
     # Programs
     "alacritty": "alacritty",
-    "discord": "flatpak run com.discordapp.Discord",
+    "discord": "discord",
+    #"discord": "flatpak run com.discordapp.Discord",
     "teams": r"flatpak run com.microsoft.Teams",
 
     # Programming
@@ -71,8 +72,8 @@ programs = {
     "terminal": "alacritty",
     "keyboard": "setxkbmap se",
     "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
-    "screen_hdmi": "xrandr --output VGA-1 --off --output LVDS-1 --off --output HDMI-1 --mode 1920x1200 --pos 0x0 --rotate normal",
-    "screen_vga": "xrandr --output HDMI-1 --off --output LVDS-1 --off --output VGA-1 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_hdmi": "xrandr --output VGA-0 --off --output LVDS --off --output HDMI-0 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_vga": "xrandr --output HDMI-0 --off --output LVDS --off --output VGA-0 --mode 1920x1200 --pos 0x0 --rotate normal",
 }
 
 class Colors:
