@@ -145,8 +145,8 @@ alias discord='flatpak run com.discordapp.Discord'
 alias atom='flatpak run io.atom.Atom'
 
 #alias sam='./home/irreq/Programs/sam'
-source "$HOME/.cargo/env"
-source "$HOME/Programs/alacritty/extra/completions/alacritty.bash"
+#source "$HOME/.cargo/env"
+#source "$HOME/Programs/alacritty/extra/completions/alacritty.bash"
 #source /home/irreq/Programs/alacritty/extra/completions/alacritty.bash
 #source $HOME/.config/nvim/plug-config/rnvimr.vim
 export EDITOR='nvim'
