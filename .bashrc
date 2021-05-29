@@ -124,7 +124,7 @@ echo $PATH | grep -Eq "(^|:)/usr/sbin(:|)" || PATH=$PATH:/usr/sbin
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx; fi
 
-alias github='cd ~/github'
+alias config='cd ~/github/config'
 alias spotify='spotify -no-zygote'
 alias thesaurus='firefox https://www.thesaurus.com/'
 alias youtube='firefox https://youtube.com'
