@@ -27,7 +27,6 @@ from libqtile.config import Group, Key, Screen
 from libqtile.widget.base import ORIENTATION_HORIZONTAL
 from libqtile.widget.base import _TextBox as BaseTextBox
 
-
 MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
 FONTSIZE = 12
@@ -58,8 +57,10 @@ programs = {
     "tester": "(alacritty &)",
 
     # Audio
-    "vol_up": "amixer -q -c 0 sset Headset 5dB+",
-    "vol_down": "amixer -q -c 0 sset Headset 5dB-",
+    #"vol_up": "amixer -q -c 0 sset Headset 5dB+",
+    #"vol_down": "amixer -q -c 0 sset Headset 5dB-",
+    "vol_up": "amixer -q sset Master 5%+",
+    "vol_down": "amixer -q sset Master 5%-",
     "pause": "python3 -q /home/irreq/github/config/audio.py toggle",
     "pavucontrol": "pavucontrol",
     "spotify": "spotify -no-zygote",
@@ -252,7 +253,8 @@ def get_datetime():
     return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
 def get_everything(*args):
-    return get_hddusage() + get_netusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
+    global test_text
+    return test_text + " " + get_hddusage() + get_netusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
 
 
 def run_program(p):
@@ -521,7 +523,6 @@ def user_keymap(mod, shift, control, alt):
     yield mod + "Return", lazy.spawn(programs["terminal"])
     yield mod + "p", lazy.window.toggle_fullscreen()
 
-    yield mod + "i", lazy.spawn("alacritty")
     # Stop stuff
     yield mod + shift + "q", lazy.window.kill()
     yield mod + shift + "r", lazy.restart()
