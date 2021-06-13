@@ -109,3 +109,11 @@ sudo flatpak install flathub com.discordapp.Discord -y
 # Install Teams
 sudo flatpak install flathub com.microsoft.Teams -y
 
+
+# Install terminal youtube player
+
+pip3 install --user mps-youtube
+pip3 install --user youtube-dl
+pip3 install --user youtube-dl --upgrade
+pip3 install --user dbus-python pygobject
+ln ~/.local/bin/mpsyt /bin/mpsyt

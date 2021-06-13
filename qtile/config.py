@@ -61,7 +61,7 @@ programs = {
     #"vol_down": "amixer -q -c 0 sset Headset 5dB-",
     "vol_up": "amixer -q sset Master 10%+",
     "vol_down": "amixer -q sset Master 10%-",
-    "pause": "python3 -q /home/irreq/github/config/audio.py toggle",
+    "pause": "python3 -q /home/irreq/github/config/programs/audio.py toggle",
     "pavucontrol": "pavucontrol",
     "spotify": "spotify -no-zygote",
 
@@ -127,7 +127,7 @@ class MemData():
         result_mem = self.main()
         used = str(result_mem[1])
         percentage = str(result_mem[2])
-        return " MEM: {}GB {}%".format(used, percentage)
+        return " RAM: {}GB {}%".format(used, percentage)
 
 
 class SysData():
@@ -666,4 +666,5 @@ follow_mouse_focus = True
 cursor_warp = True
 auto_fullscreen = True
 focus_on_window_activation = "urgent"
-wmname = "LG3D"
+#wmname = "LG3D"
+wmname = "Qtile"

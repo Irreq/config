@@ -14,4 +14,3 @@ sudo xbps-install -Suy neofetch git firefox python3 python3-pip xorg-minimal xor
 
 
 echo Installation finished, please reboot now
-
