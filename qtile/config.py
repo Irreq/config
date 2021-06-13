@@ -59,8 +59,8 @@ programs = {
     # Audio
     #"vol_up": "amixer -q -c 0 sset Headset 5dB+",
     #"vol_down": "amixer -q -c 0 sset Headset 5dB-",
-    "vol_up": "amixer -q sset Master 5%+",
-    "vol_down": "amixer -q sset Master 5%-",
+    "vol_up": "amixer -q sset Master 10%+",
+    "vol_down": "amixer -q sset Master 10%-",
     "pause": "python3 -q /home/irreq/github/config/audio.py toggle",
     "pavucontrol": "pavucontrol",
     "spotify": "spotify -no-zygote",
@@ -247,14 +247,17 @@ def get_netusage():
     return " NET: 532MB/s 99.2%"
 
 def get_hddusage(disk="/"):
-    return "HDD: 10.1GB 9.3%"
+    import shutil
+
+    total, used, free = shutil.disk_usage("/")
+    return "HDD: {}GB {}%".format(int(used/(2**30)*100)/100, int(used/total*100))
 
 def get_datetime():
     return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
 def get_everything(*args):
-    global test_text
-    return test_text + " " + get_hddusage() + get_netusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
+    # get_netusage()
+    return get_hddusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
 
 
 def run_program(p):
@@ -489,6 +492,14 @@ class CustomWindowName(widget.WindowName):
 
 
 groups = [Group(gname, label=gname.upper()) for gname in "asdfg"]
+
+@hook.subscribe.client_new
+def client_new(client):
+    if client.name == 'discord':
+        client.togroup('d')
+
+    elif client.name == 'firefox':
+        client.togroup('s')
 
 def user_keymap(mod, shift, control, alt):
     for g in groups:
