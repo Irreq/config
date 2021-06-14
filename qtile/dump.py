@@ -1,9 +1,3 @@
-import datetime
-import os
-import nltk
-import speech_recognition as sr
-
-
 def numToWords(num,join=True):
     '''words = {} convert an integer number into words'''
     units = ['','one','two','three','four','five','six','seven','eight','nine']
@@ -84,13 +78,6 @@ def time_conversion_24(hours, minutes):
 
 
 
-# print(time_conversion_24(23, 58))
-
-
-def notify(response):
-# print("SAM: {}\n".format(response))
-    os.system('sam "{}"'.format(response))
-
 def parse_query(query):
     # print("  >  {}\n".format(query))
     if query.startswith("hello"):
@@ -157,15 +144,3 @@ def recognize_speech_from_microphone(recognizer, microphone):
     return response
 
 
-if __name__ == "__main__":
-    # create recognizer and mic instances
-    recognizer = sr.Recognizer()
-    microphone = sr.Microphone()
-
-    notify("Yes?")
-    while True:
-        data = recognize_speech_from_microphone(recognizer, microphone)
-        if data["error"] != "":
-            notify(data["error"])
-        else:
-            parse_query(data["transcription"])

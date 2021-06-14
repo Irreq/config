@@ -17,9 +17,12 @@
 # - No mouse (But if you are reading this, you probably know how to navigate using a keyboard)
 
 import subprocess
+import nltk
+import shutil
 
 from datetime import datetime
 from fnmatch import fnmatch
+import speech_recognition as sr
 
 from libqtile import bar, hook, pangocffi, layout, widget
 from libqtile.command import lazy
@@ -68,6 +71,7 @@ programs = {
     # Meta
     "open": "atom",
     "filebrowser": "thunar",
+    "tts": "sam",  # requires 'SAM' as /bin/sam
     "searchbrowser": "firefox",
     "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web", # QUERY is what you type after search
     "terminal": "alacritty",
@@ -236,7 +240,6 @@ class SysData():
         cpu_percentage = str(int(sum(result_cpu[3])/len(result_cpu[3])))
         temperature = result_cpu[4]
         # Do we seriously need the CPU-frequency?
-        # return " CPU: {}GHz {}% {}°C".format(speed, cpu_percentage, temperature)
         return " CPU: {}°C {}%".format(temperature, cpu_percentage)
 
 
@@ -247,8 +250,6 @@ def get_netusage():
     return " NET: 532MB/s 99.2%"
 
 def get_hddusage(disk="/"):
-    import shutil
-
     total, used, free = shutil.disk_usage("/")
     return "HDD: {}GB {}%".format(int(used/(2**30)*100)/100, int(used/total*100))
 
@@ -256,89 +257,183 @@ def get_datetime():
     return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
 def get_everything(*args):
-    # get_netusage()
     return get_hddusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
 
-
-def run_program(p):
-    try:
-        #commands = p.split()
-        commands = ["flatpak", "run", "com.discordapp.Discord"]
-        commands = ["alacritty", "|", "ls"]
-        subprocess.Popen(commands)
-        #subprocess.Popen(['ls', '-la'], shell=False)
-    except Exception:
-        pass
-
-    return
+def launch(command):
+    """Launch a program as it would have been launched in terminal"""
+    commands = command.split()
+    subprocess.Popen(commands)
+    return True
 
 
 #### VOICE CONTROL ####
 
-try:
-    import speech_recognition as sr
+def notify(text):
+    """Runs threaded and won't affect the calling function"""
+    # subprocess.Popen([programs["tts"], text])
+    launch("{} {}".format(programs["tts"], text))
 
-    def notify(response):
-        print(response)
-
-    def parse_query(query):
-        if query.startswith("hello"):
-            notify("Hello, Isac")
-        elif query.startswith("exit"):
-            notify("Shutting down, please come back again!")
-            exit(0)
-        # elif query.startswith("terminal"):
-        else:
-            import nltk
-            tokenized = nltk.word_tokenize(query)
-            nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if (pos[:2] == 'NN')]
-            notify(" ".join(nouns))
-            notify("I'm terribly sorry, but I cannot help you with that.")
-
-    def recognize_speech_from_microphone(recognizer, microphone):
-        response = {
-                "success": True,
-                "error": "",
-                "transcription": ""
-        }
-
-        if not isinstance(recognizer, sr.Recognizer):
-            response["error"] = "`recognizer` must be `Recognizer` instance"
-
-        if not isinstance(microphone, sr.Microphone):
-            response["error"] = "`microphone` must be `Microphone` instance"
-
-        with microphone as source:
-            recognizer.adjust_for_ambient_noise(source)
-            audio = recognizer.listen(source)
-
-        try:
-            response["transcription"] = recognizer.recognize_google(audio)
-        except sr.RequestError:
-            # API was unreachable or unresponsive
-            response["success"] = False
-            response["error"] = "API unavailable"
-        except sr.UnknownValueError:
-            # speech was unintelligible
-            response["error"] = "Unable to recognize speech"
-
-        return response
-
-    def listen_and_respond():
-        # create recognizer and mic instances
-        recognizer = sr.Recognizer()
-        microphone = sr.Microphone()
-
-        while True:
-            data = recognize_speech_from_microphone(recognizer, microphone)
-            if data["error"] != "":
-                notify(data["error"])
+#### By 'Developer' https://stackoverflow.com/a/19193721 ####
+def numToWords(num,join=True):
+    '''words = {} convert an integer number into words'''
+    units = ['','one','two','three','four','five','six','seven','eight','nine']
+    teens = ['','eleven','twelve','thirteen','fourteen','fifteen','sixteen', \
+             'seventeen','eighteen','nineteen']
+    tens = ['','ten','twenty','thirty','forty','fifty','sixty','seventy', \
+            'eighty','ninety']
+    thousands = ['','thousand','million','billion','trillion','quadrillion', \
+                 'quintillion','sextillion','septillion','octillion', \
+                 'nonillion','decillion','undecillion','duodecillion', \
+                 'tredecillion','quattuordecillion','sexdecillion', \
+                 'septendecillion','octodecillion','novemdecillion', \
+                 'vigintillion']
+    words = []
+    if num==0: words.append('zero')
+    else:
+        numStr = '%d'%num
+        numStrLen = len(numStr)
+        groups = int((numStrLen+2)/3)
+        numStr = numStr.zfill(groups*3)
+        for i in range(0,groups*3,3):
+            h,t,u = int(numStr[i]),int(numStr[i+1]),int(numStr[i+2])
+            g = int(groups-(i/3+1))
+            if h>=1:
+                words.append(units[h])
+                words.append('hundred')
+            if t>1:
+                words.append(tens[t])
+                if u>=1: words.append(units[u])
+            elif t==1:
+                if u>=1: words.append(teens[u])
+                else: words.append(tens[t])
             else:
-                parse_query(data["transcription"])
+                if u>=1: words.append(units[u])
+            if (g>=1) and ((h+t+u)>0): words.append(thousands[g]+',')
+    if join: return ' '.join(words)
+    return words
+#### End ####
 
-except Exception:
-    # speech recognition is not installed
-    pass
+
+def appendInt(num):
+    num = int(num)
+    if num > 9:
+        secondToLastDigit = str(num)[-2]
+        if secondToLastDigit == '1':
+            return 'th'
+    lastDigit = num % 10
+    if (lastDigit == 1):
+        return 'st'
+    elif (lastDigit == 2):
+        return 'nd'
+    elif (lastDigit == 3):
+        return 'rd'
+    else:
+        return 'th'
+
+def time_conversion_24(hours, minutes):
+    """Convert time to words"""
+    result = numToWords(hours)
+
+    if minutes == 0:
+        result += " o'clock"
+
+    elif minutes == 15:
+        result = "quarter past " + result
+
+    elif minutes == 30:
+        result = "half past " + result
+
+    elif minutes == 45:
+        result = "quarter to " + result
+
+    elif minutes < 30:
+        result = "{} minute{} past ".format(numToWords(minutes), "" if minutes == 1 else "s") + result
+
+    else:
+        result = "{} minute{} to ".format(numToWords(60-minutes), "" if 60 - minutes == 1 else "s") + result
+    return result
+
+
+
+def parse_query(query):
+
+    if query.startswith("hello"):
+        notify("Hello, friend!")
+    elif query.startswith("exit"):
+        notify("Bye!")
+        return
+
+    elif query.startswith("time"):
+        d_date = datetime.now()
+        date = d_date.strftime("%A %d %B %Y %I %M %S")
+        date = date.split()
+        result = date[0] + " " + numToWords(int(date[1])) + appendInt(date[1]) + " " + date[2]
+        result += numToWords(int(date[3])) + " " + time_conversion_24(int(date[4]), int(date[5]))
+        result += " or " + numToWords(int(date[4])) + " and " + numToWords(int(date[5]))
+
+        notify(result)
+
+    elif query.startswith("rapport"):
+        notify("Welcome back, all systems are online and working properly!")
+    elif query.startswith("audio"):
+        os.system("python3 -q /home/irreq/github/config/programs/audio.py toggle")
+    else:
+        tokenized = nltk.word_tokenize(query)
+        nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if (pos[:2] == 'NN')]
+        # notify(" ".join(nouns))
+        try:
+            subprocess.Popen([programs[query.lower()]])
+            notify(programs[query])
+        except Exception:
+            pass
+
+        #if len(nouns) != 0:
+        #    lazy.spawn(programs[nouns[0]])
+
+        #else:
+        #    notify("What?")
+
+def recognize_speech_from_microphone(recognizer, microphone):
+    response = {
+            "success": True,
+            "error": "",
+            "transcription": ""
+    }
+
+    if not isinstance(recognizer, sr.Recognizer):
+        response["error"] = "`recognizer` must be `Recognizer` instance"
+
+    if not isinstance(microphone, sr.Microphone):
+        response["error"] = "`microphone` must be `Microphone` instance"
+
+    with microphone as source:
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
+
+    try:
+        response["transcription"] = recognizer.recognize_google(audio)
+    except sr.RequestError:
+        # API was unreachable or unresponsive
+        response["success"] = False
+        response["error"] = "API unavailable"
+    except sr.UnknownValueError:
+        # speech was unintelligible
+        response["error"] = "Unintelligible"
+
+    return response
+
+
+
+def test_tts(qtile, *args, **kwargs):
+    recognizer = sr.Recognizer()
+    microphone = sr.Microphone()
+
+    notify("Yes?")
+    data = recognize_speech_from_microphone(recognizer, microphone)
+    if data["error"] != "":
+        notify(data["error"])
+    else:
+        parse_query(data["transcription"])
 
 
 class CustomBaseTextBox(BaseTextBox):
@@ -599,6 +694,7 @@ def user_keymap(mod, shift, control, alt):
 
     # Start stuff
     yield mod + "o", lazy.spawncmd() # Open menu
+    yield mod + "y", lazy.function(test_tts) # Launch SAM assistant
     yield mod + "Return", lazy.spawn(programs["terminal"])
     yield mod + "p", lazy.window.toggle_fullscreen()
 
@@ -734,5 +830,4 @@ follow_mouse_focus = True
 cursor_warp = True
 auto_fullscreen = True
 focus_on_window_activation = "urgent"
-#wmname = "LG3D"
 wmname = "Qtile"
