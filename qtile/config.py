@@ -38,11 +38,8 @@ programs = {
     # Programs
     "alacritty": "alacritty",
     "discord": "discord",
-    #"discord": "flatpak run com.discordapp.Discord",
-    "teams": r"flatpak run com.microsoft.Teams",
 
     # Programming
-    "atom": "flatpak run io.atom.Atom",
     "nvim": "nvim",
     "vim": "vim",
     "python3": "python3",
