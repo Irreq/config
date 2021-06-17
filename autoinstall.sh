@@ -2,13 +2,21 @@
 # Forked  respin respun forked stolen and modified by DasGeek and stolen and
 # modified again by Irreq
 
+
+
+# Run this command in your terminal:
+#
+# curl https://raw.githubusercontent.com/Irreq/config/main/autoinstall.sh | sudo bash
+
+
 ## Define Temporary Directory Location
 tmp_dir=/tmp/autoinstall_tmp
 
 ## Define your install variables
 install='scratch install -y'
 update='scratch upgrade -y'
-user=$USER
+#user=$USER
+user='irreq'
 
 ## Start Script
 if [[ $EUID -ne 0 ]]; then
@@ -21,6 +29,7 @@ else
 
     echo "Creating temporary folder"
     mkdir $tmp_dir
+    cd $tmp_dir
 
     # Check if dialog has been installed
     if ! [ -e /usr/bin/dialog ] ; then
@@ -30,15 +39,30 @@ else
     cmd=(dialog --title "Irreq Installer" --separate-output --checklist "Please Select Software You Want To Install:" 22 80 16)
 
     options=(
+            1_build "Make: Program for compiling packages" on
+            2_build "CMake: Modern toolset used for generating Makefiles" on
+            3_build "Ninja: Small build system with a focus on speed" on
+
+            1_essentials "Git: Version control system" on
+            2_essentials "Wget: The non-interactive network downloader" on
+            3_essentials "Xorg-minimal" on
+            4_essentials "Ninja: Small build system with a focus on speed" on
+            5_essentials "CMake: Modern toolset used for generating Makefiles" on
+            6_essentials "Make: Program for compiling packages" on
         #A "<----Category: Software Repositories---->" on
-            1_repos "   Install Flatpak Repository" off
+            1_repos "Flatpak (Repo)" off
+            2_repos "Tar: An archiving program" on
         # Section C --------social-------------------------
-            1_social "  Install Discord (scratch)" off
+            1_social "Discord (scratch)" off
+            2_social "Discord (tar.gz)" off
         #D "<----Category: Tweaks---->" on
-	        6_tweak "   Install i3wm DE" off
+        #D "<----Category: Tweaks---->" on
+	        1_tweak "Qtile" off
+            6_tweak "Install i3wm DE" off
         #E "<----Category: Development---->" on
-            1_development " Install Git" on
-        L "   Post Install Auto Clean Up & Update" off)
+            1_development "Install Git" off
+            2_development "Neovim" off
+        L "Post Install Auto Clean Up & Update" off)
 
 
         choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
@@ -46,6 +70,25 @@ else
         for choice in $choices
         do
             case $choice in
+            1_build)
+                #Make
+                echo "Installing Make"
+                $install make
+                sleep 1
+                ;;
+            2_build)
+                #Cmake
+                echo "Installing CMake"
+                $install cmake
+                sleep 1
+                ;;
+            3_build)
+                #Ninja
+                echo "Installing Ninja"
+                $install ninja
+                sleep 1
+                ;;
+
 # Section A ------------repos----------------------
             1_repos)
                 #Install Flatpak Repo (Software Repository)
@@ -60,54 +103,45 @@ else
                 $install discord
                 sleep 1
                 ;;
+            2_social)
+                #Discord
+                echo "Installing Discord (tar.gz)"
+                cd $tmp_dir
+                mkdir -p /home/$USER/.local/bin
+                wget "https://discord.com/api/download?platform=linux&format=tar.gz"
+                ls -la
+                tar -xvf 'download?platform=linux&format=tar.gz' -C /home/$USER/.local/bin
+                sleep 1
+                ;;
 # Section D -----------tweak-----------------------
+            1_tweak)
+                echo "Installing Qtile (source)"
+                sleep 1
+                ;;
+
+            2_tweak)
+                #Qtile (xbps)
+                echo "Installing Qtile (xbps)"
+                sleep 1
+                ;;
+            3_tweak)
+                #Alacritty
+                echo "Installing Alacritty"
+                echo "Installing building tools for rust"
+                $install curl
+                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+                echo "Performing Rustup check"
+                rustup override set stable
+                rustup update stable
+                cd /home/$user
+                git clone https://github.com/alacritty/alacritty.git
+                cd alacritty
+                sleep 1
+                ;;
+
             6_tweak)
 				#Install i3wm
 				echo "Installing i3wm & config"
-				$install i3 i3status dmenu i3lock xbacklight feh conky
-				#Use XFCE panel instead of default i3 and xfce plugins
-				$install xfwm4 xfce4-statusnotifier-plugin xfce4-statusnotifier-plugin
-				$install xfce4-pulseaudio-plugin xfce4-sensors-plugin xfce4-battery-plugin
-				$install xfce4-panel xfce4-clipman-plugin xfce4-session xfce4-whiskermenu-plugin
-				$install xfce4-mount-plugin xfce4-kbdleds-plugin
-				# Installs compton to prevent screen tearing
-				sleep 2
-				$install compton unclutter
-				#hides mouse when not in use.
-				#customize and theme
-				$install lxappearance menulibre
-				sleep 2
-				mkdir /home/$USER/.config/i3
-				sleep 2
-				wget https://github.com/dasgeekchannel/i3wmFedora28Config/raw/master/i3wallpaper.png -O /home/$USER/Pictures/i3wallpaper.png
-				wget https://raw.githubusercontent.com/dasgeekchannel/i3wmFedora28Config/master/compton.conf -O /home/$USER/.config/compton.conf
-                wget https://raw.githubusercontent.com/dasgeekchannel/i3wmFedora28Config/master/config -O  /home/$USER/.config/i3/config
-                		sleep 2
-                		wget https://github.com/dasgeekchannel/i3wmFedora28Config/raw/master/xfce4.zip
-                		#wget https://github.com/dasgeekchannel/i3wmFedora28Config/archive/master.zip
-                		#unzip master.zip
-                		unzip xfce4.zip
-                		sleep 2
-                		#move current xfce settings to xfce4backup
-                		mv /home/$USER/.config/xfce4 /home/$USER/.config/xfce4backup
-                		#moves downloaded xfce4 config in place
-                		sleep 2
-                		mv xfce4 /home/$USER/.config/
-                sleep 2
-                wget https://github.com/dasgeekchannel/i3wmFedora28Config/raw/master/xfce4.zip
-                #wget https://github.com/dasgeekchannel/i3wmFedora28Config/archive/master.zip
-                #unzip master.zip
-                unzip xfce4.zip
-                sleep 2
-                #move current xfce settings to xfce4backup
-                mv /home/$USER/.config/xfce4 /home/$USER/.config/xfce4backup
-                #moves downloaded xfce4 config in place
-                sleep 2
-                mv xfce4 /home/$USER/.config/
-				sleep 2
-				chown -R $USER:$USER /home/$USER/.config/compton.conf
-				chown -R $USER:$USER /home/$USER/Pictures/i3wallpaper.png
-				chown -R $USER:$USER /home/$USER/.config/xfce4
 				chown -R $USER:$USER /home/$USER/.config/i3
 				;;
 
@@ -118,6 +152,23 @@ else
                 $install git
                 sleep 1
                 ;;
+            2_development)
+                #Neovim
+                echo "Installing Neovim"
+                cd $tmp_dir
+                echo "Installing dependencies"
+                $install gcc cmake ninja
+                echo "Cloning Neovim"
+                cd /home/$user
+                git clone https://github.com/neovim/neovim.git
+                cd neovim
+                echo "Building Neovim"
+                make
+                echo "Moving Neovim to Binaries"
+                cp build/bin/nvim /bin/nvim
+                sleep 1
+                ;;
+
 
             L)
                 #Cleanup
