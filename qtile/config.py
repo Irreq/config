@@ -17,12 +17,20 @@
 # - No mouse (But if you are reading this, you probably know how to navigate using a keyboard)
 
 import subprocess
-import nltk
+try:
+    import nltk
+except Exception:
+    nltk = False
+
 import shutil
 
 from datetime import datetime
 from fnmatch import fnmatch
-import speech_recognition as sr
+
+try:
+    import speech_recognition as sr
+except Exception:
+    sr = False
 
 from libqtile import bar, hook, pangocffi, layout, widget
 from libqtile.command import lazy
@@ -422,6 +430,9 @@ def recognize_speech_from_microphone(recognizer, microphone):
 
 
 def test_tts(qtile, *args, **kwargs):
+    if not sr:
+        notify("Speech recognition not installed")
+        return
     recognizer = sr.Recognizer()
     microphone = sr.Microphone()
 
