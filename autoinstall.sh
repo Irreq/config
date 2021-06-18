@@ -18,6 +18,8 @@ update='scratch upgrade -y'
 #user=$USER
 user='irreq'
 
+home=/home/$user
+
 ## Start Script
 if [[ $EUID -ne 0 ]]; then
     echo echo "This script must be run as root type: sudo ./autoinstall.sh"
@@ -26,6 +28,12 @@ else
     # Update and Upgrade
     echo "Updating and Upgrading"
     $update
+
+    echo "Creating file-system"
+    mkdir -p $home/Programs
+    # mkdir -p $home/github
+
+
 
     echo "Creating temporary folder"
     mkdir $tmp_dir
@@ -57,7 +65,10 @@ else
             2_social "Discord (tar.gz)" off
         #D "<----Category: Tweaks---->" on
         #D "<----Category: Tweaks---->" on
-	        1_tweak "Qtile" off
+	        1_internet "Firefox" on
+
+            1_tweak "Qtile" off
+            2_tweak "Neofetch" off
             6_tweak "Install i3wm DE" off
         #E "<----Category: Development---->" on
             1_development "Install Git" off
@@ -107,10 +118,18 @@ else
                 #Discord
                 echo "Installing Discord (tar.gz)"
                 cd $tmp_dir
-                mkdir -p /home/$USER/.local/bin
+                mkdir -p /home/$user/.local/bin
                 wget "https://discord.com/api/download?platform=linux&format=tar.gz"
                 ls -la
-                tar -xvf 'download?platform=linux&format=tar.gz' -C /home/$USER/.local/bin
+                tar -xvf 'download?platform=linux&format=tar.gz' -C /home/$user/.local/bin
+                sleep 1
+                ;;
+
+            1_internet)
+                #Firefox
+                echo "Installing Firefox"
+                cd $tmp_dir
+                $install firefox
                 sleep 1
                 ;;
 # Section D -----------tweak-----------------------
@@ -128,12 +147,11 @@ else
                 #Alacritty
                 echo "Installing Alacritty"
                 echo "Installing building tools for rust"
-                $install curl
                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
                 echo "Performing Rustup check"
                 rustup override set stable
                 rustup update stable
-                cd /home/$user
+                cd /home/$user/Programs
                 git clone https://github.com/alacritty/alacritty.git
                 cd alacritty
                 sleep 1
@@ -159,12 +177,12 @@ else
                 echo "Installing dependencies"
                 $install gcc cmake ninja
                 echo "Cloning Neovim"
-                cd /home/$user
+                cd $home/Programs
                 git clone https://github.com/neovim/neovim.git
                 cd neovim
                 echo "Building Neovim"
                 make
-                echo "Moving Neovim to Binaries"
+                echo "Moving Neovim to binaries"
                 cp build/bin/nvim /bin/nvim
                 sleep 1
                 ;;
