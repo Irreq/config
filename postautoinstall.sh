@@ -33,7 +33,7 @@ home=/home/$user
 
 ## Start Script
 if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root type: sudo ./postautoinstall.sh"
+    echo "This script must be run as root type: sudo ./postautoinstall.sh"   
     exit 1
 else
 	echo "Post Install Script"
@@ -60,14 +60,14 @@ echo "Found: $CODENAME"
 
 echo "Performing Distro-Specific Operations..."
 case $CODENAME in
-     "demo_Venom Linux")
+     "demo_Venom Linux") 
           INSTALL="scratch install -y"
 	  UPGRADE="scratch upgrade -y"
 	  UPDATE="scratch sysup -y"
 	
 	  # Setting your keyboard
 	  setxkbmap $KEYBOARD
-	
+	  
 	  # Connect to internet (requires you to use keyboard)
 	  nmtui
 
@@ -120,7 +120,8 @@ options=(
 	Make "Program for compiling packages" on
 	CMake "Modern toolset used for generating Makefiles" on
 	Ninja "Small build system with a focus on speed" on
-
+	
+	opnssh "Free version of the SSH connectivity tools" off
 	pavucontrol "PulseAudio Volume Control" on
 	pulseaudio-alsa "ALSA Configuration for PulseAudio" on
 	ffmpeg "FFmpeg is a solution to record, convert and stream audio and video" on
@@ -200,3 +201,69 @@ do
 		;;
 	esac
 done
+
+echo "Performing cleanup afterwards"
+
+chown -R $user /home/$user/*
+chown -R $user /home/$user/.local
+echo "Please install ssh and ssh keys..."
+
+while true; do	
+	read -p "Do you wish to setup config files automatically? [Y]es or [N]o " yn
+	case $yn in
+		[Yy]* ) echo "Will install config files"; break;;
+		[Nn]* ) exit;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+
+echo "Installing config files..."
+
+mkdir -p /home/$user/github
+cd /home/$user/github
+# git clone git@github.com:Irreq/config.git
+# chmod 600 ~/.ssh/*
+cd config
+
+echo "Setting up alacritty"
+mkdir -p /home/$user/.config/alacritty
+rm /home/$user/.config/alacritty/alacritty.yml
+ln alacritty/alacritty.yml /home/$user/.config/alacritty/alacritty.yml
+
+echo "Setting up Qtile"
+mkdir -p /home/$user/.config/qtile
+rm /home/$user/.config/qtile/config.py
+ln qtile/config.py /home/$user/qtile/config.py
+
+echo "Setting up Neovim"
+mkdir -p /home/$user/.config/nvim
+rm /home/$user/.config/nvim/init.vim
+ln nvim/init.vim /home/$user/init.vim
+
+echo "Setting up regular scripts"
+
+# .bashrc
+rm /home/$user/.bashrc
+ln .bashrc /home/$user/.bashrc
+
+# .xinitrc
+rm /home/$user/.xinitrc
+ln .xinitrc /home/$user/.xinitrc
+
+# .gitconfig
+rm /home/$user/.gitconfig
+ln .gitconfig /home/$user/.gitconfig
+
+
+# .fonts
+mkdir -p /home/$user/.fonts
+cp .fonts/* /home/$user/.fonts/*
+
+# Cleanup again
+echo "Changing ownership of files"
+chown -R $user /home/$user/*
+chown -R $user /home/$user/.local
+chown -R $user /home/$user/.config
+
+echo "Installation finished, please reboot now"
+
