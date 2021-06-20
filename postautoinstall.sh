@@ -60,7 +60,7 @@ echo "Found: $CODENAME"
 
 echo "Performing Distro-Specific Operations..."
 case $CODENAME in
-     "demo_Venom Linux") 
+     "Venom Linux") 
           INSTALL="scratch install -y"
 	  UPGRADE="scratch upgrade -y"
 	  UPDATE="scratch sysup -y"
@@ -81,7 +81,7 @@ case $CODENAME in
 	  echo "Performing a system sync"
 	  scratch sync
           ;;
-     "Venom Linux")
+     "Demo_Venom Linux")
           echo "Developing mode, toggle the right one later"
           ;;
      pattern-3|pattern-4|pattern-5)
