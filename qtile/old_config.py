@@ -15,8 +15,6 @@
 # Bad stuff from this config file:
 # - Little to no automation, you must specifically edit the programs in 'programs'
 # - No mouse (But if you are reading this, you probably know how to navigate using a keyboard)
-# - Not following the UNIX philosophy of only doing one thing, this file is more of a: "Do everything"
-# Which might not be ideal, but i haven't got around to implement it yet...
 
 import subprocess
 try:
@@ -90,7 +88,7 @@ programs = {
 
 class Colors:
     bg = "#282828"
-    highlight_bg = "#2596be"
+    highlight_bg = "#22d81c"
     urgent_bg = "#ff0000"
     text = "#ffffff"
     inactive_text = "#555753"
