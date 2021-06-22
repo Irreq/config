@@ -156,7 +156,7 @@ do
 		$INSTALL ninja
 		;;
 
-	
+
 	# Social
 	Discord)
 		$INSTALL wget tar cups
@@ -208,7 +208,7 @@ chown -R $user /home/$user/*
 chown -R $user /home/$user/.local
 echo "Please install ssh and ssh keys..."
 
-while true; do	
+while true; do
 	read -p "Do you wish to setup config files automatically? [Y]es or [N]o " yn
 	case $yn in
 		[Yy]* ) echo "Will install config files"; break;;

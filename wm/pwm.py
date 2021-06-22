@@ -447,7 +447,8 @@ class WindowManager():
         # create GC for title window
         font = self.display.open_font(TITLE_FONT)
         print(font, self.screen.black_pixel)
-        self.frame_gc = window.create_gc(font=font, foreground=self.screen.black_pixel)
+        # self.frame_gc = window.create_gc(font=font, foreground=self.screen.black_pixel)
+        self.frame_gc = window.create_gc(foreground=self.screen.black_pixel)
 
     def draw_frame_windows(self, window):
         """Draw a frame window surrounding a windwow WINDOW."""

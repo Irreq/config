@@ -253,18 +253,32 @@ class SysData():
 cpu = SysData()
 mem = MemData()
 
+def get_batusage():
+    current_stat = "Error"
+    charge_state = "E"
+
+    try:
+        current_stat=open("/sys/class/power_supply/BAT0/capacity","r").readline().strip()
+        charge_state=open("/sys/class/power_supply/BAT0/status","r").readline().strip()
+    except Exception:
+        pass
+
+    return " BAT: {} {}%".format(charge_state, current_stat)
+
+
+
 def get_netusage():
     return " NET: 532MB/s 99.2%"
 
 def get_hddusage(disk="/"):
     total, used, free = shutil.disk_usage("/")
-    return "HDD: {}GB {}%".format(int(used/(2**30)*100)/100, int(used/total*100))
+    return " HDD: {}GB {}%".format(int(used/(2**30)*100)/100, int(used/total*100))
 
 def get_datetime():
     return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
 def get_everything(*args):
-    return get_hddusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
+    return get_batusage() + get_hddusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
 
 def launch(command):
     """Launch a program as it would have been launched in terminal"""
