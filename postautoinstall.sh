@@ -33,7 +33,9 @@ home=/home/$user
 
 ## Start Script
 if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root type: sudo ./postautoinstall.sh"   
+    echo "This script must be run as root type: sudo ./postautoinstall.sh"
+    echo "Or type this one-liner: "
+    echo "curl https://raw.githubusercontent.com/Irreq/config/main/postautoinstall.sh | sudo bash"
     exit 1
 else
 	echo "Post Install Script"
@@ -192,6 +194,7 @@ do
 		cd neovim
 		echo "Building Neovim"
 		make
+        make install
 		echo "Moving Neovim to binaries"
 		cp build/bin/nvim /home/$user/.local/bin/nvim
 		cd $tmp_dir
