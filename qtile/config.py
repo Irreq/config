@@ -47,7 +47,7 @@ FONTSIZE = 12
 programs = {
     # Programs
     "alacritty": "alacritty",
-    "discord": "discord",
+    "discord": "Discord",
 
     # Programming
     "nvim": "nvim",

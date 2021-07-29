@@ -39,7 +39,8 @@ Plug 'scrooloose/syntastic'
 Plug 'Yggdroot/indentLine'
 Plug 'avelino/vim-bootstrap-updater'
 Plug 'vim-python/python-syntax'
-Plug 'iamcco/markdown-preview.vim'
+" Plug 'iamcco/markdown-preview.vim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 
 let g:make = 'gmake'
 if exists('make')
@@ -90,7 +91,7 @@ let g:mkdp_path_to_chrome = "/usr/bin/firefox"
     " Path to the chrome or the command to open chrome (or other modern browsers).
     " If set, g:mkdp_browserfunc would be ignored.
 
-let g:mkdp_browserfunc = 'MKDP_browserfunc_default'
+#let g:mkdp_browserfunc = 'MKDP_browserfunc_default'
 " Callback Vim function to open browser, the only parameter is the url to open.
 
 let g:mkdp_auto_start = 0

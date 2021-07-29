@@ -130,8 +130,66 @@ options=(
 	firefox "Stand-alone browser based on the Mozilla codebase" off
 	neofetch "A command-line system information tool written in bash 3.2+" off
 	alacritty "A cross-platform, GPU-accelerated terminal emulator" off
-	Qtile "A full-featured, hackablel"
-)
+	Qtile "A full-featured, hackable tiling window manager written and configured in Python" off
+    Neovim "Vim-fork focused on extensibility and usability" off
+    discord "[repo] All-in-one voice chat for gamers that's free and secure" off
+    Discord "[tar.gz] All-in-one voice chat for gamers that's free and secure" off
+    End "Post install auto cleanup and update" off)
+
+choices=$("$cmd[@]" "${options[@]}" 2>&1 >/dev/tty)
+
+for choice in $choices
+do
+    # Notify which program that is being installed
+    echo "Installing $choice"
+
+    case $choice in
+        Discord)
+            $INSTALL wget tar cups
+            mkdir -p /home/$user/.local/bin
+            wget "https://discord.com/api/download?platform=linux&format=tar.gz"
+            tar -xvf 'download?platform=linux&format=tar.gz' -C /home/$user/Programs
+            echo "Copying binaries to: ~/.local/bin"
+            cp /home/$user/Programs/Discord/Discord /home/$user/.local/bin/discord
+            ;;
+        Qtile)
+            cd $tmp_dir
+            echo "Installing dependencies"
+            $INSTALL python3-pip python3-setuptools python3-wheel python3-dbus python3-gobject pango pango-devel libffi-devel xcb-util-cursor gdk-pixbuf
+            pip install xcffib
+            pip install --no-cache-dir cairocffi
+
+                # Go to Programs
+                cd /home/$user/Programs/
+                git clone https://github.com/qtile/qtile.git
+                cd qtile
+                pip install .
+                pip install qtile
+                cp bin/qtile /bin/qtile
+                cd $tmp_dir
+                ;;
+        Neovim)
+                cd $tmp_dir
+                echo "Installing dependencies"
+                $INSTALL gcc cmake ninja git
+                echo "Cloning Neovim"
+                cd /home/$user/Programs
+                git clone https://github.com/neovim/neovim.git
+                cd neovim
+                echo "Building Neovim"
+                make
+        make install
+                echo "Moving Neovim to binaries"
+                cp build/bin/nvim /home/$user/.local/bin/nvim
+                cd $tmp_dir
+                ;;
+        *)
+            $INSTALL $choice
+            ;;
+    esac
+done
+
+
 
 
 
