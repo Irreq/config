@@ -26,11 +26,6 @@ def continuous_rectifier(x0, x, x1):
                     sigmoid function, but instead of: x -> 0<x<1
                     it is: x -> x0<x<x1
 
-                    Having k = 16 gives equal deviation among numbers,
-                    but falsely increases values within boundaries, but
-                    fixes for smaller error.
-                    Having k = 4\pi gives a smaller deviation
-                    while having k = 8 gives smallest
     ARGUMENTS:
         - x0                float() The lower boundary (min).
         - x                 float() The value to rectify.
@@ -41,10 +36,12 @@ def continuous_rectifier(x0, x, x1):
 
     return (x1 - x0) / (1 + (5*e) ** -((2*x - x1 - x0) / (x1 - x0))) + x0
 
+
 if __name__ == "__main__":
+
     a = -10
     b = 10
     c = 14
 
     result = continuous_rectifier(a, c, b)
-    print(result)
+    # print(result)

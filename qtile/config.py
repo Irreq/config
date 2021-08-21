@@ -50,6 +50,7 @@ programs = {
     "discord": "Discord",
 
     # Programming
+    "atom": "atom",
     "nvim": "nvim",
     "vim": "vim",
     "python3": "python3",
@@ -254,9 +255,10 @@ class SysData():
 cpu = SysData()
 mem = MemData()
 
+
 def get_batusage():
     current_stat = "Error"
-    charge_state = "E"
+    charge_state = "Error"
 
     try:
         current_stat=open("/sys/class/power_supply/BAT0/capacity","r").readline().strip()
@@ -267,19 +269,22 @@ def get_batusage():
     return " BAT: {} {}%".format(charge_state, current_stat)
 
 
-
 def get_netusage():
     return " NET: 532MB/s 99.2%"
+
 
 def get_hddusage(disk="/"):
     total, used, free = shutil.disk_usage("/")
     return " HDD: {}GB {}%".format(int(used/(2**30)*100)/100, int(used/total*100))
 
+
 def get_datetime():
     return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
 
+
 def get_everything(*args):
     return get_batusage() + get_hddusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
+
 
 def launch(command):
     """Launch a program as it would have been launched in terminal"""
@@ -415,6 +420,7 @@ def parse_query(query):
         #else:
         #    notify("What?")
 
+
 def recognize_speech_from_microphone(recognizer, microphone):
     response = {
             "success": True,
@@ -445,11 +451,11 @@ def recognize_speech_from_microphone(recognizer, microphone):
     return response
 
 
-
 def test_tts(qtile, *args, **kwargs):
     if not sr:
         notify("Speech recognition not installed")
         return
+
     recognizer = sr.Recognizer()
     microphone = sr.Microphone()
 
@@ -460,6 +466,8 @@ def test_tts(qtile, *args, **kwargs):
     else:
         parse_query(data["transcription"])
 
+
+# Qtile specifics
 
 class CustomBaseTextBox(BaseTextBox):
     defaults = [
@@ -689,6 +697,7 @@ def client_new(client):
     elif client.name == 'firefox':
         client.togroup('s')
 
+
 def user_keymap(mod, shift, control, alt):
     for g in groups:
         yield mod + g.name, lazy.group[g.name].toscreen()
@@ -838,13 +847,9 @@ screens = [
 
 @hook.subscribe.startup_once
 def autostart():
-    # Just add process name from programs here:
-    processes = ["keyboard", "alacritty"]
-
-    for p in processes:
-        commands = programs[p].split()
-        subprocess.Popen(commands)
-
+    # Just add process to start on boot:
+    for p in ["keyboard", "alacritty"]:
+        launch(programs[p])
 
 
 dgroups_key_binder = None
