@@ -1,5 +1,40 @@
+import pygame, sys, math
+
+class Cam:
+    def __init__(self,pos=(0,0,0),rot=(0,0,0)):
+        self.pos = list(pos)
+        self.rot = list(rot)
+
+    def update(self,dt,key):
+
+        s = dt*10
+        if key[pygame.K_LEFT]: self.pos[0] +=s
+        if key[pygame.K_RIGHT]: self.pos[0] -=s
+        if key[pygame.K_DOWN]: self.pos[1] -=s
+        if key[pygame.K_UP]: self.pos[1] +=s
+
+        #x,y = s*math.sin(self.rot[1]), s*math.cos(self.rot[1])
+        if key[pygame.K_w]: self.pos[2] +=s
+        if key[pygame.K_s]: self.pos[2] -=s
+        # if key[pygame.K_a]: self.pos[0] -=s
+        # if key[pygame.K_d]: self.pos[0] +=s
+
+pygame.init()
+w,h = 1000,1000;cx,cy = w//2,h//2
+screen = pygame.display.set_mode((w,h))
+clock = pygame.time.Clock()
+
+b = w/2
+
+verts = (-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)
+edges = (0,1),(1,2),(2,3),(3,0),(4,5),(5,6),(6,7),(7,4),(0,4),(1,5),(2,6),(3,7)
+
+cam = Cam((0,0,-5))
+
+
+
+
 from continuous_rectifier import continuous_rectifier
-# from handDetector import HandDetector
 import cv2
 import math
 import numpy as np
@@ -34,42 +69,9 @@ class HandDetector:
 
 handDetector = HandDetector(min_detection_confidence=0.7)
 
-webcamFeed = None
 webcamFeed = cv2.VideoCapture(2)
-# for i in range(5):
-#     try:
-#         webcamFeed = cv2.VideoCapture(i)
-#         break
-#     except:
-#         webcamFeed = None
 
-previous_length=50
 
-print("\n\n")
-if webcamFeed is None:
-    print("no camera was found")
-    exit()
-
-#!/usr/local/bin/python3
-#import cv2
-import numpy as np
-import random
-# Make empty black image
-# background=np.zeros((1000,1000,3),np.uint8)
-
-# while True:
-#    # Make one pixel red
-#    #
-#    point = [random.randrange(0,100), random.randrange(0,100)]
-#    image[point[0], point[1]]=[0,0,255]
-#
-#    cv2.imshow('image',image)
-#    cv2.waitKey(1)
-#
-#    time.sleep(0.01)
-#    image[point[0], point[1]]=[0,0,0]
-
-# oldx2, oldy2 = 0, 0
 while webcamFeed.isOpened():
     success, image = webcamFeed.read()
 
@@ -77,51 +79,46 @@ while webcamFeed.isOpened():
         continue
     handLandmarks = handDetector.findHandLandMarks(image=image)
 
+    dt = clock.tick()/1000
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: pygame.quit(); sys.exit()
+
+    screen.fill((0,0,0))
+
+    for edge in edges:
+        points = []
+        for x,y,z in (verts[edge[0]],verts[edge[1]]):
+            x-=cam.pos[0]
+            y-=cam.pos[1]
+            z-=cam.pos[2]
+
+            f = b/z
+            x,y = x*f,y*f
+            points += [(cx+int(x),cy+int(y))]
+        pygame.draw.line(screen,(250,0,250),points[0],points[1],1)
+
+
+    pygame.display.flip()
+
+    key = pygame.key.get_pressed()
+    cam.update(dt,key)
+
+
     if(len(handLandmarks) != 0):
         #for volume control we need 4th and 8th landmark
         #details: https://google.github.io/mediapipe/solutions/hands
 
         (_, x1, y1, z1) = handLandmarks[4]
         (_, x2, y2, z2) = handLandmarks[8]
-        # print(z2, end="                    \r")
 
-        if z2 < z1:
-            print("Index", end="             \r")
-        else:
-            print("Thumb", end="             \r")
-        continue
-
-
-        #oldx2, oldy2 = (oldx2 + x2) // 2, (oldy2 + y2) // 2
-        #print(oldx2, oldy2, end="                 \r")
-
-        #try:
-        #    background[oldy2, -oldx2] = [0,0,255]
-        #except:
-        #    pass
-        #cv2.imshow('image',background)
-        #cv2.waitKey(1)
-
-        #try:
-        #    background[oldy2, -oldx2] = [0,0,0]
-        #except:
-        #    pass
-        #continue
         length = int(math.hypot(x2-x1, y2-y1))
-        # print(length, end="                    \r")
-        # continue
-        # length = abs(int(continuous_rectifier(0, length, 110)) - 10)
-        length = abs(int(continuous_rectifier(0, length, 100)))
 
-        if abs(length-previous_length) > 5:
-            previous_length = length
-            # print(z1)
+        length = abs(int(continuous_rectifier(20, length, 120)-20))
 
-            # print("Volume: {}% {}                                     ".format(length, "="*(length//3)), end="\r")
-            # os.system("amixer -q sset Master {}%".format(length))
+        length = 101 - length
+        cam.pos[2] = length
 
-    #if cv2.waitKey(5) & 0xFF == 27:
-    #    break
 
 
 webcamFeed.release()

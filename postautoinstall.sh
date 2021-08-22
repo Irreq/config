@@ -34,7 +34,7 @@ home=/home/$user
 ## Start Script
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root type: sudo ./postautoinstall.sh"
-    echo "Or type this one-liner: "
+    echo "Or type this one-liner: (requires curl)"
     echo "curl https://raw.githubusercontent.com/Irreq/config/main/postautoinstall.sh | sudo bash"
     exit 1
 else
@@ -62,14 +62,14 @@ echo "Found: $CODENAME"
 
 echo "Performing Distro-Specific Operations..."
 case $CODENAME in
-     "Venom Linux") 
+     "Venom Linux")
           INSTALL="scratch install -y"
 	  UPGRADE="scratch upgrade -y"
 	  UPDATE="scratch sysup -y"
-	
+
 	  # Setting your keyboard
 	  setxkbmap $KEYBOARD
-	  
+
 	  # Connect to internet (requires you to use keyboard)
 	  nmtui
 
@@ -122,7 +122,7 @@ options=(
 	Make "Program for compiling packages" on
 	CMake "Modern toolset used for generating Makefiles" on
 	Ninja "Small build system with a focus on speed" on
-	
+
 	opnssh "Free version of the SSH connectivity tools" off
 	pavucontrol "PulseAudio Volume Control" on
 	pulseaudio-alsa "ALSA Configuration for PulseAudio" on
@@ -132,7 +132,7 @@ options=(
 	neofetch "A command-line system information tool written in bash 3.2+ " off
 	alacritty "A cross-platform, GPU-accelerated terminal emulator" off
 	Qtile "A full-featured, hackable tiling window manager written and configured in Python" off
-	Neovim "Vim-fork focused on extensibility and usability" off	
+	Neovim "Vim-fork focused on extensibility and usability" off
 	discord "[repo] All-in-one voice and text chat for gamers that's free and secure" off
 	Discord "[tar.gz] All-in-one voice and text chat for gamers that's free and secure" off
 	teams "Microsoft Teams for Linux is your chat-centered workspace in Office 365" off
@@ -146,7 +146,7 @@ for choice in $choices
 do
 	# Notify User of What Program Being Installed
 	echo "Installing $choice"
-	
+
 	case $choice in
 	Make)
 		$INSTALL make
@@ -174,7 +174,6 @@ do
 		$INSTALL python3-pip python3-setuptools python3-wheel python3-dbus python3-gobject pango pango-devel libffi-devel xcb-util-cursor gdk-pixbuf
 		pip install xcffib
 		pip install --no-cache-dir cairocffi
-
 		# Go to Programs
 		cd /home/$user/Programs/
 		git clone https://github.com/qtile/qtile.git
@@ -194,7 +193,7 @@ do
 		cd neovim
 		echo "Building Neovim"
 		make
-        make install
+    make install
 		echo "Moving Neovim to binaries"
 		cp build/bin/nvim /home/$user/.local/bin/nvim
 		cd $tmp_dir
@@ -269,4 +268,3 @@ chown -R $user /home/$user/.local
 chown -R $user /home/$user/.config
 
 echo "Installation finished, please reboot now"
-

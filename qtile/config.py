@@ -257,7 +257,7 @@ mem = MemData()
 
 
 def get_batusage():
-    current_stat = "Error"
+    current_stat = "-"
     charge_state = "Error"
 
     try:
