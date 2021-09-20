@@ -10,7 +10,7 @@
 #
 # Benefits from this config file:
 # + VIM-keybinds (Arrow keys aren't needed)
-# + CPU and memory usage are part of a class which can easily be obtained by another function 
+# + CPU and memory usage are part of a class which can easily be obtained by another function
 # + Easy update on a time interval for any function
 # + A static program launcher, as a simple version of dmenu_run
 #
@@ -47,9 +47,9 @@ MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
 FONTSIZE = 12
 
-things_to_display = ["Hello, World!"]
+things_to_display = [""]
 
-functions_to_display = ["battery", "storage", "memory", "cpu", "datetime"]
+functions_to_display = ["battery", "storage", "memory", "cpu", "audio", "datetime"]
 
 programs = {
     # Programs
@@ -78,6 +78,7 @@ programs = {
     "vol_up": "amixer -q sset Master 10%+",
     "vol_down": "amixer -q sset Master 10%-",
     "pause": "python3 -q /home/irreq/github/config/programs/audio.py toggle",
+    "gesture_audio": "python3 -q /home/irreq/github/config/programs/handVolumeController.py",
     "pavucontrol": "pavucontrol",
     "spotify": "spotify -no-zygote",
 
@@ -105,11 +106,7 @@ class Colors:
     highlight_text = "#d3d7cf"
 
 
-
-
 # #### TEST AREA ####
-
-
 
 def initiate_cache():
     """This function is not finished but will create a dynamic program list"""
@@ -262,6 +259,12 @@ class Status():
 
         return text, temperature, cpu_percentage
 
+    def audio(self):
+
+        percentage = 100
+
+        return "VOL: Master {}%".format(percentage), 0, 0
+
     def network(self):
         if not self.verbose:
             return 100
@@ -377,7 +380,7 @@ class AI(Status):
 
         return " ".join(final)
 
-    def main(self):
+    def update(self, *args):
 
         result = self.notifications()
 
@@ -398,16 +401,6 @@ class AI(Status):
         pleasantness = int((p_1 + 100-p_2)/2 // 10)
 
         return "I'm feeling " + self.moods[9-energy][9-pleasantness] + " " + result
-
-    def test(self):
-        function = "cpu"
-        try:
-            text, data, percentage = getattr(super(), function)()
-            result = text
-        except Exception as e:
-            result = "{} {}".format(function, str(e))
-        return text
-        return self.main()
 
 
 
@@ -446,201 +439,219 @@ class AI(Status):
 
         return (x1 - x0) / (1 + (5*e) ** -((2*x - x1 - x0) / (x1 - x0))) + x0
 
-ai = AI()
 
+ai = AI()
 
 def update_status_wrapper(*args):
 
-    # current = {}
-    #
-    # for function in st.status_items:
-    #     try:
-    #         current[function] = getattr(st, function)()
-    #     except Exception as e:
-    #         current[function] = "{} {}".format(function, str(e))
-
-    text = [ai.main()]
-    # text = ""
-    text.extend(things_to_display.copy())
-
-    # text.extend([current[i] for i in st.status_items])
-
-    # st.values = current
-
-    return " ".join(text)
+    return ai.update()
 
 #### VOICE CONTROL ####
 
+class Voice():
+
+    def __init__(self):
+        pass
+
+    def notify(self, text):
+        """Runs threaded and won't affect the calling function"""
+        launch("{} {}".format(programs["tts"], text))
+
+
+    def numToWords(self, num,join=True):
+        # By 'Developer' https://stackoverflow.com/a/19193721
+
+        '''words = {} convert an integer number into words'''
+        units = ['','one','two','three','four','five','six','seven','eight','nine']
+        teens = ['','eleven','twelve','thirteen','fourteen','fifteen','sixteen', \
+                 'seventeen','eighteen','nineteen']
+        tens = ['','ten','twenty','thirty','forty','fifty','sixty','seventy', \
+                'eighty','ninety']
+        thousands = ['','thousand','million','billion','trillion','quadrillion', \
+                     'quintillion','sextillion','septillion','octillion', \
+                     'nonillion','decillion','undecillion','duodecillion', \
+                     'tredecillion','quattuordecillion','sexdecillion', \
+                     'septendecillion','octodecillion','novemdecillion', \
+                     'vigintillion']
+        words = []
+        if num==0: words.append('zero')
+        else:
+            numStr = '%d'%num
+            numStrLen = len(numStr)
+            groups = int((numStrLen+2)/3)
+            numStr = numStr.zfill(groups*3)
+            for i in range(0,groups*3,3):
+                h,t,u = int(numStr[i]),int(numStr[i+1]),int(numStr[i+2])
+                g = int(groups-(i/3+1))
+                if h>=1:
+                    words.append(units[h])
+                    words.append('hundred')
+                if t>1:
+                    words.append(tens[t])
+                    if u>=1: words.append(units[u])
+                elif t==1:
+                    if u>=1: words.append(teens[u])
+                    else: words.append(tens[t])
+                else:
+                    if u>=1: words.append(units[u])
+                if (g>=1) and ((h+t+u)>0): words.append(thousands[g]+',')
+        if join: return ' '.join(words)
+        return words
+
+
+    def appendInt(self, num):
+        num = int(num)
+        if num > 9:
+            secondToLastDigit = str(num)[-2]
+            if secondToLastDigit == '1':
+                return 'th'
+        lastDigit = num % 10
+        if (lastDigit == 1):
+            return 'st'
+        elif (lastDigit == 2):
+            return 'nd'
+        elif (lastDigit == 3):
+            return 'rd'
+        else:
+            return 'th'
+
+
+    def time_conversion_24(self, hours, minutes):
+        """Convert time to words"""
+        result = self.numToWords(hours)
+
+        if minutes == 0:
+            result += " o'clock"
+
+        elif minutes == 15:
+            result = "quarter past " + result
+
+        elif minutes == 30:
+            result = "half past " + result
+
+        elif minutes == 45:
+            result = "quarter to " + result
+
+        elif minutes < 30:
+            result = "{} minute{} past ".format(self.numToWords(minutes), "" if minutes == 1 else "s") + result
+
+        else:
+            result = "{} minute{} to ".format(self.numToWords(60-minutes), "" if 60 - minutes == 1 else "s") + result
+        return result
+
+
+    def parse_query(self, query):
+
+        if query.startswith("hello"):
+            self.notify("Hello, friend!")
+        elif query.startswith("exit"):
+            self.notify("Bye!")
+            return
+
+        elif query.startswith("time"):
+            d_date = datetime.now()
+            date = d_date.strftime("%A %d %B %Y %I %M %S")
+            date = date.split()
+            result = date[0] + " " + self.numToWords(int(date[1])) + self.appendInt(date[1]) + " " + date[2]
+            result += self.numToWords(int(date[3])) + " " + self.time_conversion_24(int(date[4]), int(date[5]))
+            result += " or " + self.numToWords(int(date[4])) + " and " + self.numToWords(int(date[5]))
+
+            self.notify(result)
+
+        elif query.startswith("rapport"):
+            self.notify("Welcome back, all systems are online and working properly!")
+        elif query.startswith("audio"):
+            os.system("python3 -q /home/irreq/github/config/programs/audio.py toggle")
+        else:
+            tokenized = nltk.word_tokenize(query)
+            nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if (pos[:2] == 'NN')]
+            # notify(" ".join(nouns))
+            try:
+                subprocess.Popen([programs[query.lower()]])
+                self.notify(programs[query])
+            except Exception:
+                pass
+
+            #if len(nouns) != 0:
+            #    lazy.spawn(programs[nouns[0]])
+
+            #else:
+            #    notify("What?")
+
+
+    def recognize_speech_from_microphone(self, recognizer, microphone):
+        response = {
+                "success": True,
+                "error": "",
+                "transcription": ""
+        }
+
+        if not isinstance(recognizer, sr.Recognizer):
+            response["error"] = "`recognizer` must be `Recognizer` instance"
+
+        if not isinstance(microphone, sr.Microphone):
+            response["error"] = "`microphone` must be `Microphone` instance"
+
+        with microphone as source:
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.listen(source)
+
+        try:
+            response["transcription"] = recognizer.recognize_google(audio)
+        except sr.RequestError:
+            # API was unreachable or unresponsive
+            response["success"] = False
+            response["error"] = "API unavailable"
+        except sr.UnknownValueError:
+            # speech was unintelligible
+            response["error"] = "Unintelligible"
+
+        return response
+
+
+    def test_tts(self, qtile, *args, **kwargs):
+        if not sr:
+            self.notify("Speech recognition not installed")
+            return
+
+        self.notify("Working")
+        return
+
+        recognizer = sr.Recognizer()
+        microphone = sr.Microphone()
+
+        self.notify("Yes?")
+        data = self.recognize_speech_from_microphone(recognizer, microphone)
+        if data["error"] != "":
+            self.notify(data["error"])
+        else:
+            self.parse_query(data["transcription"])
+
+
+    def main(self):
+        return
+
+
+
+
+
+
 def notify(text):
     """Runs threaded and won't affect the calling function"""
-    # subprocess.Popen([programs["tts"], text])
     launch("{} {}".format(programs["tts"], text))
 
-#### By 'Developer' https://stackoverflow.com/a/19193721 ####
-def numToWords(num,join=True):
-    '''words = {} convert an integer number into words'''
-    units = ['','one','two','three','four','five','six','seven','eight','nine']
-    teens = ['','eleven','twelve','thirteen','fourteen','fifteen','sixteen', \
-             'seventeen','eighteen','nineteen']
-    tens = ['','ten','twenty','thirty','forty','fifty','sixty','seventy', \
-            'eighty','ninety']
-    thousands = ['','thousand','million','billion','trillion','quadrillion', \
-                 'quintillion','sextillion','septillion','octillion', \
-                 'nonillion','decillion','undecillion','duodecillion', \
-                 'tredecillion','quattuordecillion','sexdecillion', \
-                 'septendecillion','octodecillion','novemdecillion', \
-                 'vigintillion']
-    words = []
-    if num==0: words.append('zero')
-    else:
-        numStr = '%d'%num
-        numStrLen = len(numStr)
-        groups = int((numStrLen+2)/3)
-        numStr = numStr.zfill(groups*3)
-        for i in range(0,groups*3,3):
-            h,t,u = int(numStr[i]),int(numStr[i+1]),int(numStr[i+2])
-            g = int(groups-(i/3+1))
-            if h>=1:
-                words.append(units[h])
-                words.append('hundred')
-            if t>1:
-                words.append(tens[t])
-                if u>=1: words.append(units[u])
-            elif t==1:
-                if u>=1: words.append(teens[u])
-                else: words.append(tens[t])
-            else:
-                if u>=1: words.append(units[u])
-            if (g>=1) and ((h+t+u)>0): words.append(thousands[g]+',')
-    if join: return ' '.join(words)
-    return words
+
 #### End ####
 
 
-def appendInt(num):
-    num = int(num)
-    if num > 9:
-        secondToLastDigit = str(num)[-2]
-        if secondToLastDigit == '1':
-            return 'th'
-    lastDigit = num % 10
-    if (lastDigit == 1):
-        return 'st'
-    elif (lastDigit == 2):
-        return 'nd'
-    elif (lastDigit == 3):
-        return 'rd'
-    else:
-        return 'th'
-
-def time_conversion_24(hours, minutes):
-    """Convert time to words"""
-    result = numToWords(hours)
-
-    if minutes == 0:
-        result += " o'clock"
-
-    elif minutes == 15:
-        result = "quarter past " + result
-
-    elif minutes == 30:
-        result = "half past " + result
-
-    elif minutes == 45:
-        result = "quarter to " + result
-
-    elif minutes < 30:
-        result = "{} minute{} past ".format(numToWords(minutes), "" if minutes == 1 else "s") + result
-
-    else:
-        result = "{} minute{} to ".format(numToWords(60-minutes), "" if 60 - minutes == 1 else "s") + result
-    return result
 
 
-
-def parse_query(query):
-
-    if query.startswith("hello"):
-        notify("Hello, friend!")
-    elif query.startswith("exit"):
-        notify("Bye!")
-        return
-
-    elif query.startswith("time"):
-        d_date = datetime.now()
-        date = d_date.strftime("%A %d %B %Y %I %M %S")
-        date = date.split()
-        result = date[0] + " " + numToWords(int(date[1])) + appendInt(date[1]) + " " + date[2]
-        result += numToWords(int(date[3])) + " " + time_conversion_24(int(date[4]), int(date[5]))
-        result += " or " + numToWords(int(date[4])) + " and " + numToWords(int(date[5]))
-
-        notify(result)
-
-    elif query.startswith("rapport"):
-        notify("Welcome back, all systems are online and working properly!")
-    elif query.startswith("audio"):
-        os.system("python3 -q /home/irreq/github/config/programs/audio.py toggle")
-    else:
-        tokenized = nltk.word_tokenize(query)
-        nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if (pos[:2] == 'NN')]
-        # notify(" ".join(nouns))
-        try:
-            subprocess.Popen([programs[query.lower()]])
-            notify(programs[query])
-        except Exception:
-            pass
-
-        #if len(nouns) != 0:
-        #    lazy.spawn(programs[nouns[0]])
-
-        #else:
-        #    notify("What?")
-
-
-def recognize_speech_from_microphone(recognizer, microphone):
-    response = {
-            "success": True,
-            "error": "",
-            "transcription": ""
-    }
-
-    if not isinstance(recognizer, sr.Recognizer):
-        response["error"] = "`recognizer` must be `Recognizer` instance"
-
-    if not isinstance(microphone, sr.Microphone):
-        response["error"] = "`microphone` must be `Microphone` instance"
-
-    with microphone as source:
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
-
-    try:
-        response["transcription"] = recognizer.recognize_google(audio)
-    except sr.RequestError:
-        # API was unreachable or unresponsive
-        response["success"] = False
-        response["error"] = "API unavailable"
-    except sr.UnknownValueError:
-        # speech was unintelligible
-        response["error"] = "Unintelligible"
-
-    return response
 
 
 def test_tts(qtile, *args, **kwargs):
-    if not sr:
-        notify("Speech recognition not installed")
-        return
 
-    recognizer = sr.Recognizer()
-    microphone = sr.Microphone()
+    return notify("Yes?")
 
-    notify("Yes?")
-    data = recognize_speech_from_microphone(recognizer, microphone)
-    if data["error"] != "":
-        notify(data["error"])
-    else:
-        parse_query(data["transcription"])
 
 
 # Qtile specifics
@@ -905,6 +916,7 @@ def user_keymap(mod, shift, control, alt):
     # Start stuff
     yield mod + "o", lazy.spawncmd() # Open menu
     yield mod + "y", lazy.function(test_tts) # Launch SAM assistant
+    yield mod + "u", lazy.spawn(programs["gesture_audio"])
     yield mod + "Return", lazy.spawn(programs["terminal"])
     yield mod + "p", lazy.window.toggle_fullscreen()
 
