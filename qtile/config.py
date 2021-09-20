@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+# Windowmanager-Automationscript-Hybrid
+#
 # Author: Irreq
 #
 # I wanted to create an desktop environment with as little dependencies as necessary.
@@ -8,7 +10,7 @@
 #
 # Benefits from this config file:
 # + VIM-keybinds (Arrow keys aren't needed)
-# + CPU and memory usage are indivudual classes and should work for broader architecture
+# + CPU and memory usage are part of a class which can easily be obtained by another function 
 # + Easy update on a time interval for any function
 # + A static program launcher, as a simple version of dmenu_run
 #
