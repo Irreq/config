@@ -19,6 +19,7 @@
 # Which might not be ideal, but i haven't got around to implement it yet...
 
 import subprocess
+
 try:
     import nltk
 except Exception:
@@ -44,6 +45,10 @@ MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
 FONTSIZE = 12
 
+things_to_display = ["Hello, World!"]
+
+functions_to_display = ["battery", "storage", "memory", "cpu", "datetime"]
+
 programs = {
     # Programs
     "alacritty": "alacritty",
@@ -68,8 +73,6 @@ programs = {
     "tester": "(alacritty &)",
 
     # Audio
-    #"vol_up": "amixer -q -c 0 sset Headset 5dB+",
-    #"vol_down": "amixer -q -c 0 sset Headset 5dB-",
     "vol_up": "amixer -q sset Master 10%+",
     "vol_down": "amixer -q sset Master 10%-",
     "pause": "python3 -q /home/irreq/github/config/programs/audio.py toggle",
@@ -100,48 +103,31 @@ class Colors:
     highlight_text = "#d3d7cf"
 
 
-def make_correct(string, length, suffix="", filler="0"):
-    difference = length-len(string)
-    return string[:length] + filler*difference*(difference >= 0) + suffix
 
-class MemData():
-    def __init__(self):
-        self.path = "/proc/meminfo"
 
-    def _get_meminfo(self, head=40):
-            with open(self.path, "r") as f:
-                info = [next(f).split() for _ in range(head)]
-                return {fields[0]: float(fields[1]) for fields in info}
+# #### TEST AREA ####
 
-    def _calc_mem_values(self, mem_values):
-        """Calculate: total memory, used memory and percentage"""
 
-        # From 'htop'
-        # Total used memory = MemTotal - MemFree
-        # Non cache/buffer memory (green) = Total used memory - (Buffers + Cached memory)
-        # Buffers (blue) = Buffers
-        # Cached memory (yellow) = Cached + SReclaimable - Shmem
-        # Swap = SwapTotal - SwapFree
-        total = mem_values["MemTotal:"]
 
-        used = total - mem_values['MemFree:'] - (mem_values['Buffers:'] + (mem_values['Cached:'] + mem_values['SReclaimable:'] - mem_values['Shmem:']))
+def initiate_cache():
+    """This function is not finished but will create a dynamic program list"""
+    return
 
-        # 2^20 = 1048576
-        result = [int(i/1048576*100)/100 for i in (total, used)]
+make_and_model_path = "/sys/devices/virtual/dmi/id/product_version"
 
-        result.append(int(used / total * 100))
+def get_from_file(path):
+    content=open(path, "r").readline().strip()
+    return content
 
-        return result
 
-    def main(self):
-        return self._calc_mem_values(self._get_meminfo())
+def launch(command):
+    """Launch a program as it would have been launched in terminal"""
+    commands = command.split()
+    subprocess.Popen(commands)
+    return True
 
-    def get_memusage(self):
-        result_mem = self.main()
-        used = str(result_mem[1])
-        percentage = str(result_mem[2])
-        return " RAM: {}GB {}%".format(used, percentage)
 
+# #### STATUS BAR ####
 
 class SysData():
     def __init__(self):
@@ -231,67 +217,255 @@ class SysData():
         stat = self._get_stat()
 
         cpu = self._filter_stat(stat, avg=False)
+
         return [self._calc_cpu_percent(i) for i in cpu]
 
-    def main(self):
-        cpu = self._get_cpuinfo()
-        low, mean, high = self._calc_cpu_freqs(cpu)
 
-        core_usage = self._calc_cpu_percent_wrapper()
+class Status():
 
-        temperature = self._get_tempinfo()
+    def __init__(self, verbose=True, status_items=["cpu"]):
+        self.verbose = verbose
+        self.status_items = status_items
+        self.values = {item:[str, *(int,)*3] for item in self.status_items}
 
-        return [low, mean, high, core_usage, temperature]
+        self.dynamic_cpu = SysData()
 
-    def get_cpuusage(self):
-        result_cpu = self.main()
-        speed = make_correct(str(result_cpu[1]), 4)
-        cpu_percentage = str(int(sum(result_cpu[3])/len(result_cpu[3])))
-        temperature = result_cpu[4]
+    def make_correct(self, string, length, suffix="", filler="0"):
+        difference = length-len(string)
+        return string[:length] + filler*difference*(difference >= 0) + suffix
+
+    def cpu(self):
+        cpu_info = self.dynamic_cpu._get_cpuinfo()
+        low, mean, high = self.dynamic_cpu._calc_cpu_freqs(cpu_info)
+
+        core_usage = self.dynamic_cpu._calc_cpu_percent_wrapper()
+
+        temperature = int(self.dynamic_cpu._get_tempinfo())
+
+        # speed = self.make_correct(str(mean), 4)
+        cpu_percentage = int(sum(core_usage)/len(core_usage))
+
+        if not self.verbose:
+            HOT = 80
+            COLD = 19
+            temp = abs(continuous_rectifier(COLD, temperature, HOT)-COLD)/(HOT-COLD)*100
+
+            avg = (cpu_percentage + temp) // 2
+        else:
+            avg = cpu_percentage
+
         # Do we seriously need the CPU-frequency?
-        return " CPU: {}°C {}%".format(temperature, cpu_percentage)
+
+        text = "CPU: {}°C {}%".format(temperature, cpu_percentage)
+
+        return text, temperature, cpu_percentage
+
+    def network(self):
+        if not self.verbose:
+            return 100
+        return "NET: (UNFINISHED)"
+
+    def memory(self, path="/proc/meminfo", head=40):
+        """Calculate: total memory, used memory and percentage
+
+        From 'htop':
+
+        Total used memory = MemTotal - MemFree
+        Non cache/buffer memory (green) = Total used memory - (Buffers + Cached memory)
+        Buffers (blue) = Buffers
+        Cached memory (yellow) = Cached + SReclaimable - Shmem
+        Swap = SwapTotal - SwapFree
+        """
+
+        with open(path, "r") as f:
+            info = [next(f).split() for _ in range(head)]
+            mem_values = {fields[0]: float(fields[1]) for fields in info}
+
+        total = mem_values["MemTotal:"]
+
+        used = total - mem_values['MemFree:'] - (mem_values['Buffers:'] + (mem_values['Cached:'] + mem_values['SReclaimable:'] - mem_values['Shmem:']))
+
+        # 2^20 = 1048576
+        total, used = [int(i/1048576*100)/100 for i in (total, used)]
+
+        percentage = int(used / total * 100)
+
+        text = "RAM: {}GB {}%".format(used, percentage)
+
+        return text, used, percentage
+
+    def storage(self, disk="/"):
+        total, used, free = shutil.disk_usage("/")
+
+        status = int(used/(2**30)*100)/100
+
+        capacity = int(used/total*100)
+
+        text = "SSD: {}GB {}%".format(status, capacity)
+
+        return text, status, capacity
+
+    def battery(self):
+        capacity = "-"
+        status = "Error"
+
+        try:
+            status = get_from_file("/sys/class/power_supply/BAT0/status")
+            capacity = int(get_from_file("/sys/class/power_supply/BAT0/capacity"))
+        except Exception:
+            pass
+
+        if not self.verbose:
+            if status == "Error":
+                return 0
+            else:
+                return int(status)
+
+        text = "BAT: {} {}%".format(status, capacity)
+
+        return text, status, capacity
+
+    def datetime(self):
+        current = datetime.now()
+        # date = "{date:%Y-%m-%d}".format(date=current)
+        # time = "{time:%H:%M:%S}".format(time=current)
+        #
+        # return str(type(current))
+        return "{date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now()), 0, 0
 
 
-cpu = SysData()
-mem = MemData()
+class AI(Status):
+
+    # Pleasantness X Energy
+    moods = """
+    enraged     panicked     stressed     jittery      shocked   surprised upbeat     festive      exhilarated ecstatic
+    livid       furious      frustrated   tense        stunned   hyper     cheerful   motivated    inspired    elated
+    fuming      frightened   angry        nervous      restless  energized lively     enthusiastic optimistic  excited
+    anxious     apprehensive worried      irritated    annoyed   pleased   happy      focused      proud       thrilled
+    repulsed    troubled     concerned    uneasey      peeved    pleasant  joyful     hopeful      playful     blissful
+    disgusted   glum         disappointed down         apathetic easy      easygoing  content      loving      fulfilled
+    pessimistic morose       discouraged  sad          bored     calm      secure     satsified    grateful    touched
+    alienated   miserable    lonely       disheartened tired     relaxed   chill      restful      blessed     balanced
+    despondent  depressed    sullen       exhausted    fatigued  mellow    thoughtful peaceful     comfy       carefree
+    despair     hopeless     desolate     spent        drained   sleepy    complacent tranquil     cozy        serene
+    """
 
 
-def get_batusage():
-    current_stat = "-"
-    charge_state = "Error"
 
-    try:
-        current_stat=open("/sys/class/power_supply/BAT0/capacity","r").readline().strip()
-        charge_state=open("/sys/class/power_supply/BAT0/status","r").readline().strip()
-    except Exception:
-        pass
+    def __init__(self):
+        self.count = 0
+        super().__init__()
+        self.status_items = functions_to_display
 
-    return " BAT: {} {}%".format(charge_state, current_stat)
+        self.values = {}
+
+        self.moods = [i.split() for i in self.moods.split("\n")[1:-1]]
+
+    def notifications(self):
+        final = []
+
+        for function in self.status_items:
+            try:
+                text, data, percentage = getattr(super(), function)()
+                self.values[function] = [text, data, percentage]
+                result = text
+            except Exception as e:
+                result = "{} {}".format(function, str(e))
+            final.append(result)
+
+        return " ".join(final)
+
+    def main(self):
+
+        result = self.notifications()
+
+        _, temperature, percentage = self.values["cpu"]
+
+        HOT = 80
+        COLD = 19
+        temp = abs(self.continuous_rectifier(COLD, temperature, HOT)-COLD)/(HOT-COLD)*100
+
+        avg = (int(percentage) + temp) // 2
+
+        energy = int(avg // 10)
+
+        p_1 = self.values["storage"][2]
+
+        p_2 = self.values["battery"][2]
+
+        pleasantness = int((p_1 + 100-p_2)/2 // 10)
+
+        return "I'm feeling " + self.moods[9-energy][9-pleasantness] + " " + result
+
+    def test(self):
+        function = "cpu"
+        try:
+            text, data, percentage = getattr(super(), function)()
+            result = text
+        except Exception as e:
+            result = "{} {}".format(function, str(e))
+        return text
+        return self.main()
 
 
-def get_netusage():
-    return " NET: 532MB/s 99.2%"
+
+    def continuous_rectifier(self, x0, x, x1):
+        """
+        Theoretical Continuous Analog Rectifier For Artificial Neural Networks.
+
+        NOTE:           The algorithm yields an input-value rectified
+                        between two other values calculated by the relative
+                        distance distance. This equation is defined as:
+                        ______________________________________________________
+
+                                                x1 - x0
+                        f(x0, x, x1) = ------------------------ + x0
+                                               -(2*x - x1 - x0)
+                                                ---------------
+                                       1 + (5e)     x1 - x0
+                        ______________________________________________________
+                        If x is not between x0 and x1, x will be valued
+                        closest to that value. This will create.
+                        If x0<x<x1, x will kind of keep its value apart
+                        from minor changes. If not x0<x<x1, x will be
+                        fit within boundaries. It is basically the
+                        sigmoid function, but instead of: x -> 0<x<1
+                        it is: x -> x0<x<x1
+
+        ARGUMENTS:
+            - x0                float() The lower boundary (min).
+            - x                 float() The value to rectify.
+            - x1                float() The upper boundary (max).
+        RETURNS:
+            - float()           x0 <= x <= x1
+        """
+
+        e = 2.71828182846
+
+        return (x1 - x0) / (1 + (5*e) ** -((2*x - x1 - x0) / (x1 - x0))) + x0
+
+ai = AI()
 
 
-def get_hddusage(disk="/"):
-    total, used, free = shutil.disk_usage("/")
-    return " HDD: {}GB {}%".format(int(used/(2**30)*100)/100, int(used/total*100))
+def update_status_wrapper(*args):
 
+    # current = {}
+    #
+    # for function in st.status_items:
+    #     try:
+    #         current[function] = getattr(st, function)()
+    #     except Exception as e:
+    #         current[function] = "{} {}".format(function, str(e))
 
-def get_datetime():
-    return " {date:%Y-%m-%d %H:%M:%S}".format(date=datetime.now())
+    text = [ai.main()]
+    # text = ""
+    text.extend(things_to_display.copy())
 
+    # text.extend([current[i] for i in st.status_items])
 
-def get_everything(*args):
-    return get_batusage() + get_hddusage() + mem.get_memusage() + cpu.get_cpuusage() + get_datetime()
+    # st.values = current
 
-
-def launch(command):
-    """Launch a program as it would have been launched in terminal"""
-    commands = command.split()
-    subprocess.Popen(commands)
-    return True
-
+    return " ".join(text)
 
 #### VOICE CONTROL ####
 
@@ -828,7 +1002,7 @@ def create_widgets():
         padding=20
     )
     yield DisplayOutputFromFunctionEverySecond(
-        function=get_everything,
+        function=update_status_wrapper,
         active_color=Colors.highlight_text,
         inactive_color=Colors.inactive_text,
     )
@@ -847,8 +1021,10 @@ screens = [
 
 @hook.subscribe.startup_once
 def autostart():
+    initiate_cache()
+
     # Just add process to start on boot:
-    for p in ["keyboard", "alacritty"]:
+    for p in ["keyboard", "terminal"]:
         launch(programs[p])
 
 
