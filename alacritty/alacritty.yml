@@ -103,18 +103,15 @@ scrolling:
 font:
   # Normal (roman) font face
   normal:
-    # family: PxPlus HP 100LX 8x8
     family: PxPlus HP 100LX 10x11
     style: Regular
 
   # Bold font face
   bold:
-    # family: PxPlus HP 100LX 8x8
     family: PxPlus HP 100LX 10x11
     style: Bold
 
   # Point size
-  #size: 11.0
   size: 9
 
   # Offset is the extra space around each character. `offset.y` can be thought of

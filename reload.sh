@@ -51,16 +51,20 @@ retrieve () {
 # res="$(yesno "Install Linux?")"
 # echo $res
 
-pop=$(retrieve "Install Linux?")
-echo $pop
-
+dialog --title "Welcome" --msgbox 'Installation script' 6 30
+clear
 # exit 1
 
-if [[ $pop -eq "yes" ]]; then
-	echo yes
-else
-	echo no
-fi
+# pop=$(retrieve "Install Linux?")
+# echo $pop
+#
+# # exit 1
+#
+# if [[ $pop -eq "yes" ]]; then
+# 	echo yes
+# else
+# 	echo no
+# fi
 
 # if [[ "$(yesno "Install Linux?")" -eq "true"]]; then
 # 	echo yes

@@ -45,7 +45,7 @@ from libqtile.widget.base import _TextBox as BaseTextBox
 
 MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
-FONTSIZE = 12
+FONTSIZE = 11
 
 things_to_display = [""]
 

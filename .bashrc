@@ -121,7 +121,7 @@ fi
 # Add sbin directories to PATH.  This is useful on systems that have sudo
 echo $PATH | grep -Eq "(^|:)/sbin(:|)"     || PATH=$PATH:/sbin
 echo $PATH | grep -Eq "(^|:)/usr/sbin(:|)" || PATH=$PATH:/usr/sbin
-
+echo $PATH | grep -Eq "(^|:)$HOME/.local/bin(:|)" || PATH=$PATH:$HOME/.local/bin
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx; fi
 
@@ -151,7 +151,6 @@ alias wifi='sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-w
 #source /home/irreq/Programs/alacritty/extra/completions/alacritty.bash
 #source $HOME/.config/nvim/plug-config/rnvimr.vim
 export EDITOR='nvim'
-
 # for void:
 export $(dbus-launch)
 
