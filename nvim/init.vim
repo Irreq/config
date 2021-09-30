@@ -81,6 +81,7 @@ Plug 'tmhedberg/SimpylFold'
 
 Plug 'vim-python/python-syntax'
 
+
 " python
 " vim-python
 augroup vimrc-python
@@ -120,7 +121,18 @@ set relativenumber
 set showcmd
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ \%l/\%L,\%c
 
+"" Set relive and regular number
+"" function to toggle number mode
+"function! g:ToggleNuMode()
+    "if(&rnu == 1)
+        "set number
+    "else
+        "set relativenumber
+    "endif
+"endfunc
 
+"" map the above function to F5
+"nnoremap <f5> :call g:ToggleNuMode()<cr>
 
 syntax on
 set termguicolors

@@ -49,7 +49,7 @@ FONTSIZE = 11
 
 things_to_display = [""]
 
-functions_to_display = ["battery", "storage", "memory", "cpu", "audio", "datetime"]
+functions_to_display = ["battery", "storage", "memory", "cpu", "datetime"]
 
 programs = {
     # Programs
@@ -260,15 +260,12 @@ class Status():
         return text, temperature, cpu_percentage
 
     def audio(self):
-
         percentage = 100
-
-        return "VOL: Master {}%".format(percentage), 0, 0
+        # return "VOL: Master {}%".format(percentage), 0, 0
+        return "VOL: <UNFINISHED>", 0, 0
 
     def network(self):
-        if not self.verbose:
-            return 100
-        return "NET: (UNFINISHED)"
+        return "NET: <UNFINISHED>", 0, 0
 
     def memory(self, path="/proc/meminfo", head=40):
         """Calculate: total memory, used memory and percentage
@@ -349,7 +346,7 @@ class AI(Status):
     anxious     apprehensive worried      irritated    annoyed   pleased   happy      focused      proud       thrilled
     repulsed    troubled     concerned    uneasey      peeved    pleasant  joyful     hopeful      playful     blissful
     disgusted   glum         disappointed down         apathetic easy      easygoing  content      loving      fulfilled
-    pessimistic morose       discouraged  sad          bored     calm      secure     satsified    grateful    touched
+    pessimistic morose       discouraged  sad          bored     calm      secure     satisfied    grateful    touched
     alienated   miserable    lonely       disheartened tired     relaxed   chill      restful      blessed     balanced
     despondent  depressed    sullen       exhausted    fatigued  mellow    thoughtful peaceful     comfy       carefree
     despair     hopeless     desolate     spent        drained   sleepy    complacent tranquil     cozy        serene
@@ -825,9 +822,11 @@ class SuggestionPrompt(widget.Prompt):
                     tmp = "{} | {}".format(self.current_query["terminal"], tmp)
             self.user_input = tmp
 
-        #self.callback = run_program
+        self.callback = launch
         try:
+            # launch(self.user_input)
             super()._send_cmd()
+
         except Exception:
             self._unfocus()
 
@@ -886,6 +885,7 @@ def client_new(client):
 
 
 def user_keymap(mod, shift, control, alt):
+    """Generate keymap for operations"""
     for g in groups:
         yield mod + g.name, lazy.group[g.name].toscreen()
         yield mod + shift + g.name, lazy.window.togroup(g.name)
