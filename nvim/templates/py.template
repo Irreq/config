@@ -5,3 +5,5 @@
 # Description: Basic format for Python scripts
 # Author: {{NAME}} ({{EMAIL}})
 # Date: {{TODAY}}
+
+"""Documentation"""

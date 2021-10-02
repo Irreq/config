@@ -50,6 +50,9 @@ Plug 'zchee/deoplete-jedi'
 Plug 'scrooloose/nerdcommenter'
 " To comment <leader>cc and uncomment <leader>uc
 
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+
+
 Plug 'sbdchd/neoformat'
 " Enable alignment
 let g:neoformat_basic_format_align = 1
@@ -68,7 +71,9 @@ Plug 'neomake/neomake'
 let g:neomake_python_enabled_makers = ['pylint']
 
 
-Plug 'terryma/vim-multiple-cursors'
+"Multiple cursors
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+
 Plug 'machakann/vim-highlightedyank'
 " set highlight duration time to 1000 ms, i.e., 1 second
 let g:highlightedyank_highlight_duration = 1000
@@ -93,6 +98,17 @@ augroup END
 
 
 call plug#end()
+
+
+function! Multiple_cursors_before()
+    let b:deoplete_disable_auto_complete = 1
+endfunction
+
+function! Multiple_cursors_after()
+    let b:deoplete_disable_auto_complete = 0
+endfunction
+
+
 call neomake#configure#automake('nrwi', 500)
 
 " syntastic
@@ -134,7 +150,8 @@ set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ \%l/\%L,\%c
 "" map the above function to F5
 "nnoremap <f5> :call g:ToggleNuMode()<cr>
 
-syntax on
+"syntax on
+syntax enable
 set termguicolors
 
 
@@ -147,7 +164,6 @@ endif
 
 let g:colors_name='WhyDoWeNeedAName'
 set t_Co=256
-
 
 
 " misc
@@ -171,8 +187,8 @@ hi Folded           guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=2
 hi FoldColumn       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
 hi SignColumn       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
 hi IncSearch        guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
-hi LineNr           guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
-hi LineNrAbove      guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi LineNr           guisp=NONE guifg=#555753 guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
+hi LineNrAbove      guisp=NONE guifg=#555753 guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
 hi LineNrBelow      guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
 hi CursorLineNr     guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
 hi MatchParen       guisp=NONE guifg=#ffffff guibg=#282828 ctermfg=231 ctermbg=234 gui=NONE cterm=NONE
