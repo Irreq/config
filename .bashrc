@@ -33,6 +33,34 @@ case "$TERM" in
     xterm-color) color_prompt=yes;;
 esac
 
+
+if [ "$TERM" = "linux" ]; then
+    echo -en "\e]P0232323" #black
+    echo -en "\e]P82B2B2B" #darkgrey
+    echo -en "\e]P1D75F5F" #darkred
+    echo -en "\e]P9E33636" #red
+    echo -en "\e]P287AF5F" #darkgreen
+    echo -en "\e]PA98E34D" #green
+    echo -en "\e]P3D7AF87" #brown
+    echo -en "\e]PBFFD75F" #yellow
+    echo -en "\e]P48787AF" #darkblue
+    echo -en "\e]PC7373C9" #blue
+    echo -en "\e]P5BD53A5" #darkmagenta
+    echo -en "\e]PDD633B2" #magenta
+    echo -en "\e]P65FAFAF" #darkcyan
+    echo -en "\e]PE44C9C9" #cyan
+    echo -en "\e]P7E5E5E5" #lightgrey
+    echo -en "\e]PFFFFFFF" #white
+    clear #for background artifacting
+fi
+
+
+
+
+
+
+
+
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
@@ -134,12 +162,12 @@ alias cls='clear'
 
 
 # System
-alias update='sudo xbps-install -Su'
-alias install='sudo xbps-install -Su'
-alias remove='sudo xbps-remove -Oo'
-alias reboot='sudo reboot now'
-alias shutdown='sudo shutdown -h now'
-alias wifi='sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf'
+#alias update='sudo xbps-install -Su'
+#alias install='sudo xbps-install -Su'
+#alias remove='sudo xbps-remove -Oo'
+#alias reboot='sudo reboot now'
+#alias shutdown='sudo shutdown -h now'
+#alias wifi='sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf'
 
 # for flatpak:
 #alias teams='flatpak run com.microsoft.Teams'

@@ -43,6 +43,7 @@ from libqtile.config import Group, Key, Screen
 from libqtile.widget.base import ORIENTATION_HORIZONTAL
 from libqtile.widget.base import _TextBox as BaseTextBox
 
+
 MOD = "mod4"
 FONT = "PxPlus HP 100LX 10x11"
 FONTSIZE = 11
@@ -397,7 +398,7 @@ class AI(Status):
 
         pleasantness = int((p_1 + 100-p_2)/2 // 10)
 
-        return "I'm feeling " + self.moods[9-energy][9-pleasantness] + " " + result
+        return " ".join(things_to_display) + " I'm feeling " + self.moods[9-energy][9-pleasantness] + " " + result
 
 
 

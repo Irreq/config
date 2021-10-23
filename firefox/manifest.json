@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "version": "1.0",
+  "name": "Plain-material",
+  "theme": {
+    "images": {},
+    "properties": {},
+    "colors": {
+      "toolbar": "rgb(40, 40, 40)",
+      "toolbar_text": "rgb(85, 87, 83)",
+      "frame": "rgb(40, 40, 40)",
+      "tab_background_text": "rgb(255, 255, 255)",
+      "toolbar_field": "rgb(0, 0, 0)",
+      "toolbar_field_text": "rgb(183, 183, 183)",
+      "tab_line": "rgb(15, 15, 15)",
+      "popup": "rgb(0, 0, 0)",
+      "popup_text": "rgb(255, 255, 255)",
+      "toolbar_top_separator": "rgb(40, 40, 40)",
+      "tab_loading": "rgb(15, 15, 15)"
+    }
+  }
+}
