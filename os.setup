@@ -44,6 +44,8 @@ Literally the best config site!
 
 "scrot '%Y-%m-%d_$wx$h_scrot.png' -e 'mv $f ~/Pictures/'"
 
+Change <ctrl> <alt> <Fx> using:
+chvt 7
 -----------------------------------
 ---------- Screen layout ----------
 -----------------------------------

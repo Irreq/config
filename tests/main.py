@@ -1,17 +1,134 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# File name: config.py
-# Description: Desktop environment
+# File name: main.py
+# Description: Main Module For My Desktop Environment
 # Author: irreq (irreq@protonmail.com)
-# Date: 03/10/2021
-# Version: 3.2.0
+# Date: 02/11/2021
+#
+# I wanted to create an desktop environment with as little dependencies as
+# necessary.
+# Many of programs like 'dmenu' and 'amixer' has been implented in python to
+# use a smaller number of packages.
+#
+# Benefits from this config file:
+# + VIM-keybinds (Arrow keys aren't needed)
+# + CPU and memory usage are part of a class which can easily be obtained by
+# another function
+# + Easy update on a time interval for any function
+# + A static program launcher, as a simple version of dmenu_run
+#
+# Bad stuff from this config file:
+# - Little to no automation, you must specifically edit the programs in 'programs'
+# - No mouse (But if you are reading this, you probably know how to navigate
+# using a keyboard)
+# - Not following the UNIX philosophy of only doing one thing, this file is
+# more of a: "Do everything"
+# Which might not be ideal, but i haven't got around to implement it yet...
+
+
+# TODO:
+# * Current playing Audio | Hard
+# * Current Volume Level | Easy
+# * Network status and speed | Medium
+# * Auto detection of hardware (Start programs) | Medium
+# * Dynamic Program selection | Easy
+# * Notifications? | Easy
+# * MORE AI | -
+"""Documentation"""
+
+# Imports
+
+import subprocess
+
+try:
+    import nltk
+except Exception:
+    nltk = False
+
+import shutil
+
+from datetime import datetime
+from fnmatch import fnmatch
+
+try:
+    import speech_recognition as sr
+    sr_mode = "Working"
+except Exception:
+    sr = False
+    sr_mode = "not_Working"
+
+things_to_display = ["",]
+
+functions_to_display = ["battery", "storage_test", "memory", "cpu", "datetime"]
+
+programs = {
+    # Programs
+    "alacritty": "alacritty",
+    "discord": "Discord",
+
+    # Programming
+    "atom": "atom",
+    "nvim": "nvim",
+    "vim": "vim",
+    "python3": "alacritty",
+
+    # Web
+    "firefox": "firefox",
+    "github": "firefox https://github.com/Irreq",
+    "youtube": "https://www.youtube.com/results?search_query=QUERY",
+
+    # System (be careful, some stuff might break)
+    "update": "sudo xbps-install -Su",
+    "reboot": "sudo reboot now",
+    "shutdown": "sudo shutdown -h now",
+
+    "tester": "(alacritty &)",
+
+    # Audio
+    "vol_up": "amixer -q sset Master 10%+",
+    "vol_down": "amixer -q sset Master 10%-",
+    "pause": "python3 -q /home/irreq/github/config/programs/audio.py toggle",
+    "gesture_audio": "python3 -q /home/irreq/github/config/programs/handVolumeController.py",
+    "pavucontrol": "pavucontrol",
+    "spotify": "spotify -no-zygote",
+
+    # Meta
+    "open": "atom",
+    "filebrowser": "thunar",
+    "tts": "sam",  # requires 'SAM' as /bin/sam
+    "searchbrowser": "firefox",
+    "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web", # QUERY is what you type after search
+    "terminal": "alacritty",
+    "keyboard": "setxkbmap se",
+    "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
+    "screen_hdmi": "xrandr --output VGA-0 --off --output LVDS --off --output HDMI-0 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_vga": "xrandr --output HDMI-0 --off --output LVDS --off --output VGA-0 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_vga_thinkpad": "xrandr --output HDMI-0 --off --output LVDS1 --off --output VGA1 --mode 1920x1200 --pos 0x0 --rotate normal",
+}
+
+def program_ul(p):
+    if p in programs:
+        return programs[p]
+
+# #### TEST AREA ####
+
+def initiate_cache():
+    """This function is not finished but will create a dynamic program list"""
+    return
+
+make_and_model_path = "/sys/devices/virtual/dmi/id/product_version"
+
+def get_from_file(path):
+    content=open(path, "r").readline().strip()
+    return content
 
 
 def launch(command):
     """Launch a program as it would have been launched in terminal"""
     commands = command.split()
     subprocess.Popen(commands)
+    return True
 
 
 # #### STATUS BAR ####
@@ -195,6 +312,9 @@ class Status():
 
         return text, status, capacity
 
+    def storage_test(self):
+        return "SSD: <TESTING>", 0, 80
+
     def battery(self):
         capacity = "-"
         status = "Error"
@@ -279,13 +399,13 @@ class AI(Status):
 
         energy = int(avg // 10)
 
-        p_1 = self.values["storage"][2]
+        p_1 = self.values["storage_test"][2]
 
         p_2 = self.values["battery"][2]
 
         pleasantness = int((p_1 + 100-p_2)/2 // 10)
 
-        return "I'm feeling " + self.moods[9-energy][9-pleasantness] + " " + result
+        return " ".join(things_to_display) + " I'm feeling " + self.moods[9-energy][9-pleasantness] + " " + result
 
 
 
@@ -325,31 +445,212 @@ class AI(Status):
         return (x1 - x0) / (1 + (5*e) ** -((2*x - x1 - x0) / (x1 - x0))) + x0
 
 
-class SuggestionPrompt():
-    """Retrieve a choice by the user
-    from a set of choices or what the user has
-    typed
-    """
+ai = AI()
 
-    def __init__(self, *args, **kwargs):
-        """Cache"""
-        self.cache = self._load_cache() or {}
+def update_status_wrapper(*args):
 
-    def _initiate_cache(self, path):
-        """initiate an archive of executables"""
+    return ai.update()
+
+#### VOICE CONTROL ####
+
+class Voice():
+
+    def __init__(self):
+        pass
+
+    def notify(self, text):
+        """Runs threaded and won't affect the calling function"""
+        launch("{} {}".format(programs["tts"], text))
+
+
+    def numToWords(self, num,join=True):
+        # By 'Developer' https://stackoverflow.com/a/19193721
+
+        '''words = {} convert an integer number into words'''
+        units = ['','one','two','three','four','five','six','seven','eight','nine']
+        teens = ['','eleven','twelve','thirteen','fourteen','fifteen','sixteen', \
+                 'seventeen','eighteen','nineteen']
+        tens = ['','ten','twenty','thirty','forty','fifty','sixty','seventy', \
+                'eighty','ninety']
+        thousands = ['','thousand','million','billion','trillion','quadrillion', \
+                     'quintillion','sextillion','septillion','octillion', \
+                     'nonillion','decillion','undecillion','duodecillion', \
+                     'tredecillion','quattuordecillion','sexdecillion', \
+                     'septendecillion','octodecillion','novemdecillion', \
+                     'vigintillion']
+        words = []
+        if num==0: words.append('zero')
+        else:
+            numStr = '%d'%num
+            numStrLen = len(numStr)
+            groups = int((numStrLen+2)/3)
+            numStr = numStr.zfill(groups*3)
+            for i in range(0,groups*3,3):
+                h,t,u = int(numStr[i]),int(numStr[i+1]),int(numStr[i+2])
+                g = int(groups-(i/3+1))
+                if h>=1:
+                    words.append(units[h])
+                    words.append('hundred')
+                if t>1:
+                    words.append(tens[t])
+                    if u>=1: words.append(units[u])
+                elif t==1:
+                    if u>=1: words.append(teens[u])
+                    else: words.append(tens[t])
+                else:
+                    if u>=1: words.append(units[u])
+                if (g>=1) and ((h+t+u)>0): words.append(thousands[g]+',')
+        if join: return ' '.join(words)
+        return words
+
+
+    def appendInt(self, num):
+        num = int(num)
+        if num > 9:
+            secondToLastDigit = str(num)[-2]
+            if secondToLastDigit == '1':
+                return 'th'
+        lastDigit = num % 10
+        if (lastDigit == 1):
+            return 'st'
+        elif (lastDigit == 2):
+            return 'nd'
+        elif (lastDigit == 3):
+            return 'rd'
+        else:
+            return 'th'
+
+
+    def time_conversion_24(self, hours, minutes):
+        """Convert time to words"""
+        result = self.numToWords(hours)
+
+        if minutes == 0:
+            result += " o'clock"
+
+        elif minutes == 15:
+            result = "quarter past " + result
+
+        elif minutes == 30:
+            result = "half past " + result
+
+        elif minutes == 45:
+            result = "quarter to " + result
+
+        elif minutes < 30:
+            result = "{} minute{} past ".format(self.numToWords(minutes), "" if minutes == 1 else "s") + result
+
+        else:
+            result = "{} minute{} to ".format(self.numToWords(60-minutes), "" if 60 - minutes == 1 else "s") + result
+        return result
+
+
+    def parse_query(self, query):
+
+        if query.startswith("hello"):
+            self.notify("Hello, friend!")
+        elif query.startswith("exit"):
+            self.notify("Bye!")
+            return
+
+        elif query.startswith("time"):
+            d_date = datetime.now()
+            date = d_date.strftime("%A %d %B %Y %I %M %S")
+            date = date.split()
+            result = date[0] + " " + self.numToWords(int(date[1])) + self.appendInt(date[1]) + " " + date[2]
+            result += self.numToWords(int(date[3])) + " " + self.time_conversion_24(int(date[4]), int(date[5]))
+            result += " or " + self.numToWords(int(date[4])) + " and " + self.numToWords(int(date[5]))
+
+            self.notify(result)
+
+        elif query.startswith("rapport"):
+            self.notify("Welcome back, all systems are online and working properly!")
+        elif query.startswith("audio"):
+            os.system("python3 -q /home/irreq/github/config/programs/audio.py toggle")
+        else:
+            tokenized = nltk.word_tokenize(query)
+            nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if (pos[:2] == 'NN')]
+            # notify(" ".join(nouns))
+            try:
+                subprocess.Popen([programs[query.lower()]])
+                self.notify(programs[query])
+            except Exception:
+                pass
+
+            #if len(nouns) != 0:
+            #    lazy.spawn(programs[nouns[0]])
+
+            #else:
+            #    notify("What?")
+
+
+    def recognize_speech_from_microphone(self, recognizer, microphone):
+        response = {
+                "success": True,
+                "error": "",
+                "transcription": ""
+        }
+
+        if not isinstance(recognizer, sr.Recognizer):
+            response["error"] = "`recognizer` must be `Recognizer` instance"
+
+        if not isinstance(microphone, sr.Microphone):
+            response["error"] = "`microphone` must be `Microphone` instance"
+
+        with microphone as source:
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.listen(source)
+
+        try:
+            response["transcription"] = recognizer.recognize_google(audio)
+        except sr.RequestError:
+            # API was unreachable or unresponsive
+            response["success"] = False
+            response["error"] = "API unavailable"
+        except sr.UnknownValueError:
+            # speech was unintelligible
+            response["error"] = "Unintelligible"
+
+        return response
+
+
+    def test_tts(self, qtile, *args, **kwargs):
+        if not sr:
+            self.notify("Speech recognition not installed")
+            return
+
+        self.notify("Working")
+        # return
+
+        recognizer = sr.Recognizer()
+
+        # Error occurs here when PyAudio is not installed
+        microphone = sr.Microphone()
+
+        self.notify("Yes?")
+        data = self.recognize_speech_from_microphone(recognizer, microphone)
+        if data["error"] != "":
+            self.notify(data["error"])
+        else:
+            self.parse_query(data["transcription"])
+
+
+    def main(self):
         return
 
-    def _load_cache(self, path):
-        """load an archive of executables"""
-        return
 
-    def _update_cache(self, programs: dict()):
-        """update an archive of executables
-        Example:
-        >>>self._update_cache({"terminal": "alacritty"})
-        """
-        return
 
-    def startInput(self, *choices: list()):
-        """Start the input from the user"""
-        return
+
+
+
+def notify(text):
+    """Runs threaded and won't affect the calling function"""
+    launch("{} {}".format(programs["tts"], text))
+
+
+#### End ####
+
+
+def test_tts(qtile, *args, **kwargs):
+    # voice.test_tts(2, 3)
+    return notify("Check Python Script")
