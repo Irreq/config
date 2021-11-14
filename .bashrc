@@ -54,13 +54,6 @@ if [ "$TERM" = "linux" ]; then
     clear #for background artifacting
 fi
 
-
-
-
-
-
-
-
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
@@ -101,13 +94,7 @@ nc='\[\e[0m\]'
 if [ "$UID" = 0 ]; then
     PS1="$red\u$nc@$red\H$nc:$CYAN\w$nc\\n$red#$nc "
 else
-    # PS1="$PURPLE\u$nc@$CYAN\H$nc:$GREEN\w$nc$GREEN\$$nc "
-    # PS1="🎅\[\e[33;41m\][\[\e[m\]\[\e[32m\]\u\[\e[m\]\[\e[36m\]@\[\e[m\]\[\e[34m\]\h\[\e[m\]\[\e[33;41m\]]\[\e[m\]🎄 "
-    # PS1="[$red\u$nc@$red\H$nc]:$CYAN \W\$  "
-    # PS1="\n[$PURPLE\u$nc@$CYAN\H$nc]→ $GREEN\w$nc\\n\n$GREENd$GREEN( ˘︶˘)っ$nc"
-    # PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue → $PURPLE\w$RED]$nc$ "
     PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue # $PURPLE\w$RED]$nc$ "
-    # PS1="$RED[$yellow\u$YELLOW@$GREEN\H$blue → $PURPLE\w$RED]$nc$ "
 fi
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -115,7 +102,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
     alias dir='dir --color=auto'
     #alias vdir='vdir --color=auto'
-
     alias grep='grep --color=auto'
     #alias fgrep='fgrep --color=auto'
     #alias egrep='egrep --color=auto'
@@ -155,33 +141,9 @@ echo $PATH | grep -Eq "(^|:)/usr/local/texlive/2021/bin/x86_64-linux(:|)" || PAT
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx; fi
 
 alias config='cd ~/github/config'
-alias spotify='spotify -no-zygote'
-alias thesaurus='firefox https://www.thesaurus.com/'
-alias youtube='firefox https://youtube.com'
 alias cls='clear'
 
-
-# System
-#alias update='sudo xbps-install -Su'
-#alias install='sudo xbps-install -Su'
-#alias remove='sudo xbps-remove -Oo'
-#alias reboot='sudo reboot now'
-#alias shutdown='sudo shutdown -h now'
-#alias wifi='sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf'
-
-# for flatpak:
-#alias teams='flatpak run com.microsoft.Teams'
-#alias discord='flatpak run com.discordapp.Discord'
-#alias atom='flatpak run io.atom.Atom'
-
-#alias sam='./home/irreq/Programs/sam'
-#source "$HOME/.cargo/env"
-#source "$HOME/Programs/alacritty/extra/completions/alacritty.bash"
-#source /home/irreq/Programs/alacritty/extra/completions/alacritty.bash
-#source $HOME/.config/nvim/plug-config/rnvimr.vim
 export EDITOR='nvim'
-# for void:
-export $(dbus-launch)
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
