@@ -33,6 +33,22 @@ let g:tmpl_author_email = 'irreq@protonmail.com'
 
 Plug 'lervag/vimtex'
 " latexmk -pdf -pvc test.tex
+let g:tex_flavor='latex'
+let g:vimtex_view_method='zathura'
+let g:vimtex_quickfix_mode=0
+
+
+
+
+" For tex completion
+Plug 'sirver/ultisnips'
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
+
+
+
+
 
 Plug 'Raimondi/delimitMate'
 

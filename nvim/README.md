@@ -12,30 +12,6 @@ common keybinds:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <p align="center">
   <a href="https://example.com/">
     <img src="https://via.placeholder.com/72" alt="Logo" width=72 height=72>
@@ -119,5 +95,3 @@ Some Text
 Code and documentation copyright 2011-2018 the authors. Code released under the [MIT License](https://reponame/blob/master/LICENSE).
 
 Enjoy :metal:
-
-

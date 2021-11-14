@@ -22,7 +22,7 @@ from libqtile.widget.base import _TextBox as BaseTextBox
 
 
 import os, sys
-path = os.path.expanduser("~/github/config/tests")
+path = os.path.expanduser("~/github/programs/de")
 sys.path.append(path)
 
 try:
