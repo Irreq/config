@@ -289,7 +289,7 @@ def client_new(client):
     elif client.name == 'Mozilla Firefox':
         client.togroup('s')
 
-    if client.name == 'Atom Dev':
+    elif client.name == 'Atom Dev':
         client.togroup('a')
 
 
