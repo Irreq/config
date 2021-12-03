@@ -17,8 +17,12 @@ All other stuff like statusbar are located in a different file. See down below.
 from libqtile import bar, hook, pangocffi, layout, widget
 from libqtile.command import lazy
 from libqtile.config import Group, Key, Screen
+# For macros on Logitech M570
+from libqtile.config import EzClick as Click
+
 from libqtile.widget.base import ORIENTATION_HORIZONTAL
 from libqtile.widget.base import _TextBox as BaseTextBox
+
 
 
 import os, sys
@@ -441,6 +445,14 @@ screens = [
     ),
 ]
 
+
+
+# For Logitech M570
+mouse = [
+    Click("8", lazy.spawn(program("terminal"))),  # Macro 2 = Open terminal
+    Click("9", lazy.spawn(program("pause"))),  # Macro 1 = Open menu
+    Click("M-9", lazy.window.kill())  # 'Super' + Macro 1 = Kill window
+]
 
 @hook.subscribe.startup_once
 def autostart():
