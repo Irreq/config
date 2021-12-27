@@ -78,7 +78,7 @@ class MetricsListener(ThreadPoolText):
             sock = False
 
         finally:
-            ThreadPoolText.__init__(self, "Nothing on ('{}' {}) DO NOT RESTART QTILE UNTIL METRIC DEAMON IS RUNNING".format(self.udp_ip, self.udp_port), **config)
+            super().__init__(self, "Nothing on ('{}' {}) DO NOT RESTART QTILE UNTIL METRIC DEAMON IS RUNNING".format(self.udp_ip, self.udp_port), **config)
             self.update_interval = 1
 
     def poll(self):
@@ -115,8 +115,6 @@ class CustomBaseTextBox(BaseTextBox):
 hook.subscribe.hooks.add("prompt_focus")
 hook.subscribe.hooks.add("prompt_unfocus")
 
-
-# Two 'programs' here:
 
 class SuggestionPrompt(widget.Prompt):
 
