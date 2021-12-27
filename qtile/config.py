@@ -78,7 +78,7 @@ class MetricsListener(ThreadPoolText):
             sock = False
 
         finally:
-            super().__init__(self, "Nothing on ('{}' {}) DO NOT RESTART QTILE UNTIL METRIC DEAMON IS RUNNING".format(self.udp_ip, self.udp_port), **config)
+            super().__init__("Nothing on ('{}' {}) DO NOT RESTART QTILE UNTIL METRIC DEAMON IS RUNNING".format(self.udp_ip, self.udp_port), **config)
             self.update_interval = 1
 
     def poll(self):
