@@ -25,12 +25,14 @@ from libqtile.config import EzClick as Click
 
 from libqtile.widget.base import ORIENTATION_HORIZONTAL
 from libqtile.widget.base import _TextBox as BaseTextBox
-
+from libqtile.widget.base import InLoopPollText, ThreadPoolText
 
 # For every other function
 import os, sys
 path = os.path.expanduser("~/github/programs/de")
 sys.path.append(path)
+
+import socket
 
 try:
     from main import programs, update_status_wrapper, launch, test_tts
@@ -62,8 +64,31 @@ class Colors:
     highlight_text = "#d3d7cf"
 
 
+class MetricsListener(ThreadPoolText):
+    def __init__(self, udp_ip="localhost", udp_port=28441, **config):
+        self.udp_ip = udp_ip
+        self.udp_port = udp_port
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            # [Errno 98] Address already in use, https://stackoverflow.com/questions/4465959/python-errno-98-address-already-in-use
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.sock.bind((udp_ip, udp_port))
+        except Exception as e:
+            print(e)
+            sock = False
 
-# Qtile specifics
+        finally:
+            ThreadPoolText.__init__(self, "Nothing on ('{}' {}) DO NOT RESTART QTILE UNTIL METRIC DEAMON IS RUNNING".format(self.udp_ip, self.udp_port), **config)
+            self.update_interval = 1
+
+    def poll(self):
+        if self.sock:
+            # buffer size is 1024 bytes
+            data, addr = self.sock.recvfrom(1024)
+            return data.decode("utf8")
+        else:
+            return "Socket Error"
+
 
 class CustomBaseTextBox(BaseTextBox):
     defaults = [
@@ -85,66 +110,6 @@ class CustomBaseTextBox(BaseTextBox):
             int(self.bar.height / 2.0 - self.layout.height / 2.0) + 1 + self.text_shift,  # here
         )
         self.drawer.draw(offsetx=self.offsetx, width=self.width)
-
-
-class DisplayOutputFromFunctionEverySecond(CustomBaseTextBox):
-    orientations = ORIENTATION_HORIZONTAL
-    defaults = [
-        ("active_color", "ff4000", "Color of active indicator"),
-        ("inactive_color", "888888", "Color of inactive indicator"),
-        ("update_interval", 1, "Update interval in seconds"),
-    ]
-
-    def __init__(self, *func_args, function: "name of function", **config):
-        # text is set to '' as there is no initial output
-        super().__init__(text='', **config)
-        self.add_defaults(DisplayOutputFromFunctionEverySecond.defaults)
-        self.func_args = func_args
-        self.function = function
-        # This function will be called every "1" second but change to fit your needs
-        self.update()
-        if self.padding is None:
-            self.padding = 4
-
-    def update(self):
-        output = str(self.function(self.func_args))
-
-        output_color = self.active_color
-
-        redraw = True
-        redraw_bar = False
-
-        old_width = None
-        if self.layout:
-            old_width = self.layout.width
-
-        # Checks that color haven't changed
-        if output_color != self.foreground:
-            redraw = True
-            self.foreground = output_color
-
-        # No need to update if nothing changed
-        if output != self.text:
-            redraw = True
-            self.text = output
-
-        if not self.configured:
-            return
-
-        if self.layout.width != old_width:
-            redraw_bar = True
-
-        if redraw_bar:
-            self.bar.draw()
-        elif redraw:
-            self.draw()
-
-    def timer_setup(self):
-        self.timeout_add(self.update_interval, self._auto_update)
-
-    def _auto_update(self):
-        self.update()
-        self.timeout_add(self.update_interval, self._auto_update)
 
 
 hook.subscribe.hooks.add("prompt_focus")
@@ -290,14 +255,20 @@ groups = [Group(gname, label=gname.upper()) for gname in "asdfgzxcvbnm"]
 
 @hook.subscribe.client_new
 def client_new(client):
+    # Rules for new programs
     if client.name == 'discord':
         client.togroup('d')
-
     elif client.name == 'Mozilla Firefox':
         client.togroup('s')
-
     elif client.name == 'Atom Dev':
         client.togroup('a')
+
+
+@hook.subscribe.startup_once
+def autostart():
+    # Processes to start during boot:
+    for p in ["keyboard", "terminal", "firefox"]:
+        launch(program(p))
 
 
 def user_keymap(mod, shift, control, alt):
@@ -431,10 +402,10 @@ def create_widgets():
     yield CustomWindowName(
         padding=20
     )
-    yield DisplayOutputFromFunctionEverySecond(
-        function=update_status_wrapper,
-        active_color=Colors.highlight_text,
-        inactive_color=Colors.inactive_text,
+    yield MetricsListener(
+        font=FONT,
+        fontsize=FONTSIZE,
+        foreground=Colors.highlight_text,
     )
 
 
@@ -448,23 +419,14 @@ screens = [
     ),
 ]
 
-
-
 # For Logitech M570
 mouse = [
     Click("8", lazy.spawn(program("terminal"))),  # Macro 2 = Open terminal
     Click("9", lazy.spawn(program("pause"))),  # Macro 1 = Open menu
     Click("M-9", lazy.window.kill()),  # 'Super' + Macro 1 = Kill window
-    Click("M-4", lazy.spawn(program("vol_up"))),
-    Click("M-5", lazy.spawn(program("vol_down")))
+    Click("M-4", lazy.spawn(program("vol_up"))),  # 'Super' + Wheel = increase volume
+    Click("M-5", lazy.spawn(program("vol_down")))  # 'Super' + Wheel = derease volume
 ]
-
-@hook.subscribe.startup_once
-def autostart():
-
-    # Just add process to start on boot:
-    for p in ["keyboard", "terminal", "firefox"]:
-        launch(program(p))
 
 
 dgroups_key_binder = None
