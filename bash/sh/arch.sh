@@ -14,5 +14,4 @@ grub-install /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Install is finished
-
 pacman -S xorg-server xorg-xinit xf86-video-amdgpu xf86-video-ati xf86-video-intel

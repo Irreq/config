@@ -12,79 +12,29 @@ from libqtile.command import lazy
 
 from libqtile.config import Group, Key, Screen
 from libqtile.config import EzClick as Click  # For macros on Logitech M570
+from libqtile.config import EzKey  # To rebind keys on Deltaco DK440R
 
 from libqtile.widget.base import _TextBox, ThreadPoolText, ORIENTATION_HORIZONTAL
+
+import socket  # To connect to pymetricsd.py daemon
 
 # For every other function
 import os, sys
 path = os.path.expanduser("~/github/programs/de")
 sys.path.append(path)
+from main import programs, program, launch
 
-try:
-    from main import programs, launch, test_tts
-except ModuleNotFoundError:
-    print("[USER] module 'main' could not be found, does it exist?")
+GROUPS = "asdfgzxcvbnm"
 
-import socket
-
-try:
-    from main import program_ul as program
-except Exception as e:
-    print(e)
-    def program(p):
-        if p in programs:
-            return programs[p]
-
-# CONFIG
-
-alias = {
-    # Programs
-    "alacritty": "alacritty",
-    "discord": "Discord",
-
-    # Programming
-    "atom": "atom",
-    "nvim": "nvim",
-    "vim": "vim",
-    "python3": "alacritty",
-
-    # Web
-    "firefox": "firefox",
-    "github": "firefox https://github.com/Irreq",
-    "youtube": "https://www.youtube.com/results?search_query=QUERY",
-
-    # System (be careful, some stuff might break)
-    "update": "sudo xbps-install -Su",
-    "reboot": "sudo reboot now",
-    "shutdown": "sudo shutdown -h now",
-
-    "_tester": "(alacritty &)",
-
-    # Audio
-    "vol_up": "amixer -q sset Master 10%+",
-    "vol_down": "amixer -q sset Master 10%-",
-    "pause": "python3 -q /home/irreq/github/programs/audio.py toggle",
-    "gesture_audio": "python3 -q /home/irreq/github/programs/handVolumeController.py",
-    "pavucontrol": "pavucontrol",
-    "spotify": "spotify -no-zygote",
-
-    # Meta
-    "open": "atom",
-    "filebrowser": "thunar",
-    "tts": "sam",  # requires 'SAM' as /bin/sam
-    "searchbrowser": "firefox",
-    "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web", # QUERY is what you type after search
-    "terminal": "alacritty",
-    "keyboard": "setxkbmap se",
-    "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
-    "screen_hdmi": "xrandr --output VGA-0 --off --output LVDS --off --output HDMI-0 --mode 1920x1200 --pos 0x0 --rotate normal",
-    "screen_vga": "xrandr --output HDMI-0 --off --output LVDS --off --output VGA-0 --mode 1920x1200 --pos 0x0 --rotate normal",
-    "screen_vga_thinkpad": "xrandr --output HDMI-0 --off --output LVDS1 --off --output VGA1 --mode 1920x1200 --pos 0x0 --rotate normal",
-}
-
-MOD = "mod4"  # The 'Super' key, aka Windows-key
+# Cosmetics
 FONT = "PxPlus HP 100LX 10x11"
 FONTSIZE = 11
+
+# Keyboard
+mod = "mod4"  # The 'Super' key
+shift = "shift"
+control = "control"
+left, down, up, right = ("h", "j", "k", "l")  # Movement keys
 
 
 class Colors:
@@ -240,7 +190,6 @@ class SuggestionPrompt(widget.Prompt):
             if self.chosen != "":
                 self.text = self.chosen
 
-
             self.text = self.display + self.text
 
             if self.available:
@@ -316,108 +265,63 @@ class CustomWindowName(widget.WindowName):
             self.bar.draw()
 
 
-groups = [Group(gname, label=gname.upper()) for gname in "asdfgzxcvbnm"]
+def home_or_end(qtile, kk):
+    from pynput.keyboard import Key, Controller
+    import time
 
-@hook.subscribe.client_new
-def client_new(client):
-    # Rules for new programs
-    if client.name == 'discord':
-        client.togroup('d')
-    elif client.name == 'Mozilla Firefox':
-        client.togroup('s')
-    elif client.name == 'Atom Dev':
-        client.togroup('a')
+    keyboard = Controller()
 
+    # Press and release  delay
+    time.sleep(0.2)
 
-@hook.subscribe.startup_once
-def autostart():
-    # Processes to start during boot:
-    for p in ["keyboard", "terminal", "firefox"]:
-        launch(program(p))
+    k = getattr(Key, kk)
+    keyboard.press(k)
+    keyboard.release(k)
 
+keys = [
+    # Move
+    Key([mod], left, lazy.layout.left()),
+    Key([mod], down, lazy.layout.down()),
+    Key([mod], up, lazy.layout.up()),
+    Key([mod], right, lazy.layout.right()),
 
-def user_keymap(mod, shift, control, alt):
-    """Generate keymap for operations"""
-    for g in groups:
-        yield mod + g.name, lazy.group[g.name].toscreen()
-        yield mod + shift + g.name, lazy.window.togroup(g.name)
+    # Shuffle
+    Key([mod, shift], left, lazy.layout.shuffle_left()),
+    Key([mod, shift], down, lazy.layout.shuffle_down()),
+    Key([mod, shift], up, lazy.layout.shuffle_up()),
+    Key([mod, shift], right, lazy.layout.shuffle_right()),
 
-    # VIM keybinds
-    yield mod + "h", lazy.layout.left()
-    yield mod + "j", lazy.layout.down()
-    yield mod + "k", lazy.layout.up()
-    yield mod + "l", lazy.layout.right()
-
-    # yield mod + "n", lazy.layout.normalize()
-
-    yield mod + shift + "h", lazy.layout.shuffle_left()
-    yield mod + shift + "j", lazy.layout.shuffle_down()
-    yield mod + shift + "k", lazy.layout.shuffle_up()
-    yield mod + shift + "l", lazy.layout.shuffle_right()
-
-    yield mod + control + "h", lazy.layout.grow_left()
-    yield mod + control + "j", lazy.layout.grow_down()
-    yield mod + control + "k", lazy.layout.grow_up()
-    yield mod + control + "l", lazy.layout.grow_right()
+    # Size
+    Key([mod, control], left, lazy.layout.grow_left()),
+    Key([mod, control], down, lazy.layout.grow_down()),
+    Key([mod, control], up, lazy.layout.grow_up()),
+    Key([mod, control], right, lazy.layout.grow_right()),
 
     # Audio
-    yield mod + "comma", lazy.spawn(program("vol_down"))
-    yield mod + "period", lazy.spawn(program("vol_up"))
-    yield mod + "minus", lazy.spawn(program("pause"))
+    Key([mod], "comma", lazy.spawn(program("vol_down"))),
+    Key([mod], "period", lazy.spawn(program("vol_up"))),
+    Key([mod], "minus", lazy.spawn(program("pause"))),
 
     # Start stuff
-    yield mod + "o", lazy.spawncmd() # Open menu
-    yield mod + "y", lazy.function(test_tts) # Launch SAM assistant
-    yield mod + "u", lazy.spawn(program("gesture_audio"))
-    yield mod + "Return", lazy.spawn(program("terminal"))
-    yield mod + "p", lazy.window.toggle_fullscreen()
+    Key([mod], "o", lazy.spawncmd()),  # Open menu
+    Key([mod], "Return", lazy.spawn(program("terminal"))),
 
     # Stop stuff
-    yield mod + shift + "q", lazy.window.kill()
-    yield mod + shift + "r", lazy.restart()
+    Key([mod, shift], "q", lazy.window.kill()),
+    Key([mod, shift], "r", lazy.restart()),
 
+    # Shortcuts to rebind 'home' & 'end' for Deltaco DK440R
+    Key([mod], "Left", lazy.function(home_or_end, "home")),
+    Key([mod], "Right", lazy.function(home_or_end, "end"))
+]
 
-def make_keymap(user_map):
-    result = []
+groups = [Group(gname, label=gname.upper()) for gname in GROUPS]
 
-    class KeyCombo:
-        def __init__(self, mods, key):
-            self._mods = mods
-            self._key = key
-
-    class KeyMods:
-        def __init__(self, mods):
-            self._mods = set(mods)
-
-        def __add__(self, other):
-            if isinstance(other, KeyMods):
-                return KeyMods(self._mods | other._mods)
-            else:
-                return KeyCombo(self._mods, other)
-
-    for k, cmd in user_map(
-        KeyMods({'mod4'}),
-        KeyMods({'shift'}),
-        KeyMods({'control'}),
-        KeyMods({'mod1'}),
-    ):
-        if isinstance(k, str):
-            mods = set()
-        elif isinstance(k, KeyCombo):
-            mods = k._mods
-            k = k._key
-        else:
-            continue
-
-        if 'lock' in mods:
-            continue
-
-        result.append(Key(list(mods), k, cmd))
-
-    return result
-
-
-keys = make_keymap(user_keymap)
+# Handle groups, `mod` + key -> go to that group.
+# `mod` & shift + key -> move window to group.
+for g in groups:
+    keys.extend([Key([mod], g.name, lazy.group[g.name].toscreen()),
+                 Key([mod, shift], g.name, lazy.window.togroup(g.name))])
 
 layouts = [
     layout.Columns(border_focus_stack=0, border_width=0),
@@ -437,58 +341,52 @@ widget_defaults = dict(
     markup=False,
 )
 
-
-def create_widgets():
-    yield SuggestionPrompt(
-        prompt=" > ",
-        padding=2,
-        foreground=Colors.highlight_text,
-        cursor_color=Colors.highlight_text,
-    )
-    yield widget.GroupBox(
-        disable_drag=True,
-        hide_unused=True,
-        use_mouse_wheel=False,
-        padding_x=4,
-        padding_y=0,
-        margin_y=4,
-        spacing=0,
-        borderwidth=0,
-        highlight_method="block",
-        urgent_alert_method="block",
-        rounded=True,
-        active=Colors.text,
-        inactive=Colors.inactive_text,
-        urgent_border=Colors.urgent_bg,
-        this_current_screen_border=Colors.highlight_bg,
-        fontsize=FONTSIZE,
-        font=FONT,
-    )
-    yield CustomWindowName(
-        padding=20
-    )
-    # yield metricsListener(
-    #     ThreadPoolText,
-    #     font=FONT,
-    #     fontsize=FONTSIZE,
-    #     foreground=Colors.highlight_text,
-    # )
-    yield MetricsListener(
-        font=FONT,
-        fontsize=FONTSIZE,
-        foreground=Colors.highlight_text,
-    )
-
-
 screens = [
     Screen(
         bottom=bar.Bar(
-            list(create_widgets()),
-            FONTSIZE+0, # bar height
+            [SuggestionPrompt(
+                prompt=" > ",
+                padding=2,
+                foreground=Colors.highlight_text,
+                cursor_color=Colors.highlight_text,
+            ),
+            widget.GroupBox(
+                disable_drag=True,
+                hide_unused=True,
+                use_mouse_wheel=False,
+                padding_x=4,
+                padding_y=0,
+                margin_y=4,
+                spacing=0,
+                borderwidth=0,
+                highlight_method="block",
+                urgent_alert_method="block",
+                rounded=True,
+                active=Colors.text,
+                inactive=Colors.inactive_text,
+                urgent_border=Colors.urgent_bg,
+                this_current_screen_border=Colors.highlight_bg,
+                fontsize=FONTSIZE,
+                font=FONT,
+            ),
+            CustomWindowName(
+                padding=20
+            ),
+            MetricsListener(
+                font=FONT,
+                fontsize=FONTSIZE,
+                foreground=Colors.highlight_text,
+            ),
+            ],
+            FONTSIZE+0, # Bar height
             background=Colors.bg,
         ),
     ),
 ]
+
+# Emulate function keys as 'super' + f*
+fk = "python3 ~/github/programs/presskey ctrl+alt+f"
+keys.extend([EzKey("M-" + str(i), lazy.spawn(fk+str(i))) for i in range(1,9)])
 
 # For Logitech M570
 mouse = [
@@ -499,6 +397,21 @@ mouse = [
     Click("M-5", lazy.spawn(program("vol_down")))  # 'Super' + Wheel = derease volume
 ]
 
+@hook.subscribe.client_new
+def client_new(client):
+    # Rules for new programs
+    if client.name == 'Discord':
+        client.togroup('d')
+    elif client.name == 'Mozilla Firefox':
+        client.togroup('s')
+    elif client.name == 'Atom Dev':
+        client.togroup('a')
+
+@hook.subscribe.startup_once
+def autostart():
+    # Processes to start during boot:
+    for p in ["keyboard", "terminal", "firefox"]:
+        launch(program(p))
 
 dgroups_key_binder = None
 dgroups_app_rules = []
