@@ -6,6 +6,14 @@
 # Author: irreq (irreq@protonmail.com)
 # Date: 02/11/2021
 
+
+
+# For every other function
+import os
+import sys
+
+import socket  # To connect to pymetricsd.py daemon
+
 from libqtile import bar, hook, pangocffi, layout, widget
 
 from libqtile.command import lazy
@@ -14,12 +22,9 @@ from libqtile.config import Group, Key, Screen
 from libqtile.config import EzClick as Click  # For macros on Logitech M570
 from libqtile.config import EzKey  # To rebind keys on Deltaco DK440R
 
-from libqtile.widget.base import _TextBox, ThreadPoolText, ORIENTATION_HORIZONTAL
+from libqtile.widget.base import _TextBox, ThreadPoolText
+from libqtile.widget import KeyboardLayout
 
-import socket  # To connect to pymetricsd.py daemon
-
-# For every other function
-import os, sys
 path = os.path.expanduser("~/github/programs/de")
 sys.path.append(path)
 from main import programs, program, launch
@@ -36,6 +41,9 @@ shift = "shift"
 control = "control"
 left, down, up, right = ("h", "j", "k", "l")  # Movement keys
 
+def test():
+    import time
+    return str(time.time())
 
 class Colors:
     bg = "#282828"
@@ -372,6 +380,15 @@ screens = [
             CustomWindowName(
                 padding=20
             ),
+            KeyboardLayout(
+                font=FONT,
+                fontsize=FONTSIZE,
+                foreground=Colors.highlight_text,
+                # func=test,
+                configured_keyboards=["se", "se svdvorak"],
+                update_interval=1,
+                padding=20,
+                ),
             MetricsListener(
                 font=FONT,
                 fontsize=FONTSIZE,
