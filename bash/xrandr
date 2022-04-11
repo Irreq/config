@@ -1,0 +1,18 @@
+#!/bin/bash
+
+xrandr \
+  # --dpi 282 \
+  # --fb 9409x2160 \
+  --output eDP --primary --mode 3840x2160 --pos 0x0 --rotate normal \
+  --output DisplayPort-7 --mode 3840x2160 --right-of eDP --rotate normal \
+  --output DisplayPort-4 --mode 1280x1024 --pos 7681x0 --scale 1.6875x1.6875 --rotate left;
+
+xrandr \
+
+  --output LVDS1 --mode 1600x900 --pos 0x0 --rotate normal \
+  --output HDMI1 --primary --mode 1920x1200 --right-of LVDS1 --rotate normal \
+  --output VGA1 --mode 1920x1200 --pos 3520x0 --rotate normal;
+
+# xrandr --output LVDS1 --mode 1600x900 --pos 0x0 --rotate normal --output HDMI1 --primary --mode 1920x1200 --right-of LVDS1 --rotate normal --output VGA1 --mode 1920x1200 --right-of HDMI1 --rotate normal
+
+# xrandr --output HDMI1 --primary --mode 1920x1200 --output VGA1 --mode 1920x1200 --right-of HDMI1

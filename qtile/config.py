@@ -423,11 +423,13 @@ def client_new(client):
         client.togroup('s')
     elif client.name == 'Atom Dev':
         client.togroup('a')
+    elif client.name == 'Volume Control':
+        client.togroup('g')
 
 @hook.subscribe.startup_once
 def autostart():
     # Processes to start during boot:
-    for p in ["keyboard", "terminal", "firefox"]:
+    for p in ["keyboard", "terminal", "firefox", "pavucontrol"]:
         launch(program(p))
 
 dgroups_key_binder = None

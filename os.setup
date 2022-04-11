@@ -30,6 +30,9 @@ alias spotify='spotify -no-zygote'
 Audio management
 
 
+pyaudio pip (require portaudio)
+pip install --global-option='build_ext' --global-option='-I/usr/local/include' --global-option='-L/usr/local/lib' pyaudio
+
 programs to install:
 
 python, firefox, neofetch, nvim

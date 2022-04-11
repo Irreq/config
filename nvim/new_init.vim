@@ -108,8 +108,7 @@ nnoremap <C-\> :NERDTreeToggle<CR>
 Plug 'https://github.com/joshdick/onedark.vim'
 
 " Syntax Highlight
-" Plug 'numirias/semshi', { 'do': ':UpdateRemotePlugins' }
-
+Plug 'numirias/semshi', { 'do': ':UpdateRemotePlugins' }
 
 call plug#end()
 
@@ -125,9 +124,6 @@ set bomb
 set binary
 
 let mapleader=' ' " Space
-
-" Press i to enter insert mode, and ii to exit insert mode.
-:inoremap ii <Esc>
 
 "*****************************************************************************
 " Visual Settings
