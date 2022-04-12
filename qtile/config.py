@@ -29,6 +29,52 @@ path = os.path.expanduser("~/github/programs/de")
 sys.path.append(path)
 from main import programs, program, launch
 
+programs = {
+    # Programs
+    "alacritty": "alacritty",
+    "discord": "Discord",
+
+    # Programming
+    "atom": "atom",
+    "nvim": "nvim",
+    "vim": "vim",
+    "python3": "alacritty",
+
+    # Web
+    "firefox": "firefox",
+    "github": "firefox https://github.com/Irreq",
+    "youtube": "https://www.youtube.com/results?search_query=QUERY",
+
+    # System (be careful, some stuff might break)
+    "update": "sudo xbps-install -Su",
+    "reboot": "sudo reboot now",
+    "shutdown": "sudo shutdown -h now",
+
+    "tester": "(alacritty &)",
+
+    # Audio
+    "vol_up": "amixer -q sset Master 10%+",
+    "vol_down": "amixer -q sset Master 10%-",
+    "pause": "python3 -q /home/irreq/github/programs/audio.py toggle",
+    "gesture_audio": "python3 -q /home/irreq/github/programs/handVolumeController.py",
+    "pavucontrol": "pavucontrol",
+    "spotify": "spotify -no-zygote",
+
+    # Meta
+    "open": "atom",
+    "filebrowser": "thunar",
+    "tts": "sam",  # requires 'SAM' as /bin/sam
+    "searchbrowser": "firefox",
+    "search": "firefox https://duckduckgo.com/?q=QUERY&ia=web", # QUERY is what you type after search
+    "terminal": "alacritty",
+    "keyboard": "setxkbmap se",
+    "wifi": "sudo wpa_supplicant -B -iwlo1 -c/etc/wpa_supplicant/wpa_supplicant-wlo1.conf",
+    "screen_hdmi": "xrandr --output VGA-0 --off --output LVDS --off --output HDMI-0 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_vga": "xrandr --output HDMI-0 --off --output LVDS --off --output VGA-0 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_vga_thinkpad": "xrandr --output HDMI-0 --off --output LVDS1 --off --output VGA1 --mode 1920x1200 --pos 0x0 --rotate normal",
+    "screen_multi_thinkpad": "xrandr --output HDMI1 --primary --mode 1920x1200 --output VGA1 --mode 1920x1200 --right-of HDMI1"
+}
+
 GROUPS = "asdfgzxcvbnm"
 
 # Cosmetics
