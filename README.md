@@ -5,9 +5,9 @@
   <p align="center">
     Directory for my .config files and associated programs
     <br>
-    <a href="https://reponame/issues/new?template=bug.md">Report bug</a>
+    <a href="https://github.com/Irreq/config/issues/new?template=bug.md">Report bug</a>
     ·
-    <a href="https://reponame/issues/new?template=feature.md&labels=feature">Request feature</a>
+    <a href="https://github.com/Irreq/config/issues/new?template=feature.md&labels=feature">Request feature</a>
   </p>
 </p>
 
@@ -38,15 +38,26 @@ Here goes all the budgets
 
 ## What's included
 
-Some text
-
 ```text
-folder1/
-└── folder2/
-    ├── folder3/
-    │   ├── file1
-    │   └── file2
-    └── folder4/
+config/
+├── .fonts/
+|   └── ...
+├── alacritty/
+|   └── alacritty.yml
+├── bash/
+|   ├── sh/
+|   |   ├── auto.sh
+|   |   └── test.sh
+|   ├── postautoinstall.sh  
+|   └── xrandr
+├── arch/
+|   ├── arch.sh
+|   └── installed.txt
+├── alacritty/
+|   └── alacritty.yml
+
+
+
         ├── file3
         └── file4
 ```

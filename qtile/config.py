@@ -399,7 +399,8 @@ screens = [
     Screen(
         bottom=bar.Bar(
             [SuggestionPrompt(
-                prompt=" > ",
+		widget="SuggestionPrompt",
+		prompt=" > ",
                 padding=2,
                 foreground=Colors.highlight_text,
                 cursor_color=Colors.highlight_text,

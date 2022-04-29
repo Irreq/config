@@ -7,9 +7,8 @@ setxkbmap se &
 
 # exec python3 /home/irreq/github/programs/test_de/wm/main.py
 
-# exec /home/irreq/github/iwm/iwm
+exec /home/irreq/github/iwm/iwm
 
-
-#exec python3 /home/irreq/github/projects/python_2021/wm/pwm.py
-exec qtile start
+# exec python3 /home/irreq/github/projects/python_2021/wm/pwm.py
+#exec qtile start
 #exec i3

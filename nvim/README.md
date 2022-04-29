@@ -3,95 +3,91 @@
 This is the help file for many of the commands in the neovim file
 
 
-common keybinds:
+## Keybinds
 
 <super>
 
+Comment
+
+	<leader>cc: comment
+	<leader>cu: uncomment
 
 
+IDE
 
+    <leader>d: go to definition
+    K: check documentation of class or method
+    <leader>n: show the usage of a name in current file
+    <leader>r: rename a name
 
-
-<p align="center">
-  <a href="https://example.com/">
-    <img src="https://via.placeholder.com/72" alt="Logo" width=72 height=72>
-  </a>
-
-  <h3 align="center">Logo</h3>
-
-  <p align="center">
-    Short description
-    <br>
-    <a href="https://reponame/issues/new?template=bug.md">Report bug</a>
-    ·
-    <a href="https://reponame/issues/new?template=feature.md&labels=feature">Request feature</a>
-  </p>
-</p>
-
-
-## Table of contents
-
-- [Quick start](#quick-start)
-- [Status](#status)
-- [What's included](#whats-included)
-- [Bugs and feature requests](#bugs-and-feature-requests)
-- [Contributing](#contributing)
-- [Creators](#creators)
-- [Thanks](#thanks)
-- [Copyright and license](#copyright-and-license)
-
-
-## Quick start
-
-Some text
-
-- Instruction 1
-- Instruction 2
-- Instruction 3
-
-## Status
-
-Here goes all the budgets
 
 ## What's included
 
-Some text
+Files and folders for NeoVim
 
 ```text
-folder1/
-└── folder2/
-    ├── folder3/
-    │   ├── file1
-    │   └── file2
-    └── folder4/
-        ├── file3
-        └── file4
+nvim/
+└── templates/
+│   ├── py.template
+│   ├── README.md.template
+│   └── tex.template
+├── init.vim
+├── install.sh
+└── README.md
 ```
 
-## Bugs and feature requests
+# TemplateInit Placeholders
 
-Have a bug or a feature request? Please first read the [issue guidelines](https://reponame/blob/master/CONTRIBUTING.md) and search for existing and closed issues. If your problem or idea is not addressed yet, [please open a new issue](https://reponame/issues/new).
 
-## Contributing
+The Following placeholders are currently supported by this plugin
+Date & Time
 
-Please read through our [contributing guidelines](https://reponame/blob/master/CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
+    DAY : Day of the week in short form (Mon, Tue, Wed, etc,)
+    DAY_FULL : Day of the week in full (Monday, Tueseday, etc.)
+    DATE : Date of the month (01 to 31)
+    MONTH: Month of the year (01 to 12)
+    MONTH_SHORT : Short name of the month (Jan, Feb, Mar, etc.)
+    MONTH_FULL : Full month name (January, February, etc.)
+    YEAR : current year (2016)
+    TODAY: Todays date in dd/mm/yyyy format
+    TIME : Current time in 24 our format
+    TIME_12 : Current time in 12 hour format
+    TIMESTAMP : Current Timestamp, e.g.: Sunday Nov 27, 2016 15:33:33 IST
 
-Moreover, all HTML and CSS should conform to the [Code Guide](https://github.com/mdo/code-guide), maintained by [Main author](https://github.com/usernamemainauthor).
+Authoring
 
-Editor preferences are available in the [editor config](https://reponame/blob/master/.editorconfig) for easy use in common text editors. Read more and download plugins at <https://editorconfig.org/>.
+    NAME : Name of the author, g:tmpl_author_name, default : $USER
+    HOSTNAME : Name of the host machine, g:tmpl_author_hostname, default : $HOSTNAME
+    EMAIL : Email of the author, g:tmpl_author_email, default : $USER@$HOSTNAME
 
-## Creators
+File name
 
-**Creator 1**
+    FILE : Basename of the file filename.ext -> filename
+    FILEE : Filename with extension filename.ext -> filename.ext
+    FILEF : Absolute path of the file /path/to/directory/filename.ext
+    FILER : Filepath relative to the current directory (pwd)/relative/to/filename.ext
+    FILED : Absolute path of the file's parent directory /path/to/directory
+    FILEP : The file's parent directory /path/to/directory -> directory
+    FILERD : Directory relative to the current directory (pwd)/relative/to/
 
-- <https://github.com/usernamecreator1>
+License and Copyright
 
-## Thanks
+    LICENSE : License of the project, g:tmpl_license, default : MIT
+    LICENSE_FILE : Reads lincese from license file onto the next line, g:tmpl_license_file. If no file path is provided then file is read in following order-
+        LICENSE
+        LICENSE.txt
+        LICENSE.md
+        license.txt
+        license.md
+    COPYRIGHT : Copyright message, g:tmpl_copyright, default : Copyright (c) g:tmpl_company
 
-Some Text
+Others
 
-## Copyright and license
-
-Code and documentation copyright 2011-2018 the authors. Code released under the [MIT License](https://reponame/blob/master/LICENSE).
-
-Enjoy :metal:
+    PROJECT : Name of the project, g:tmpl_project, default: not expanded
+    COMPANY : Name of the company, g:tmpl_company, default: not expanded
+    MACRO_GUARD : Macro guard for use in c/c++ files. filename.h -> FILENAME_H. All dots(.) and dashes (-) present in filename are converted into underscores (_).
+    MACRO_GUARD_FULL : Same as MACRO_GUARD, except relative path is used in place of file name. e.g. relative/to/filename.h -> RELATIVE_TO_FILENAME_H
+    CLASS : class name, same as FILE
+    CAMEL_CLASS : class name converted to camel case long_file_name.txt -> LongFileName
+    SNAKE_CLASS : class name converted to snake case LongFileName.txt -> long_file_name
+    CURSOR : This is a spacial placeholder, it does not expand into anything but the cursor is placed at this location after the template expansion
