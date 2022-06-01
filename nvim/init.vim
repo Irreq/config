@@ -53,6 +53,8 @@ Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'zchee/deoplete-jedi'
 let g:deoplete#enable_at_startup = 1
 
+Plug 'deoplete-plugins/deoplete-clang'
+
 " Code Checking Python
 Plug 'neomake/neomake'
 let g:neomake_python_enabled_makers = ['pylint']

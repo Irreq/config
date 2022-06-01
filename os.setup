@@ -70,3 +70,6 @@ teams, thunar, baobab, atom, alacritty, pavucontrol, discord
 
 How to do passwordless autologin is by modifying /etc/inittab which is the first script
 that is controlling the other terminals
+
+# For two screens
+xrandr --output DP-2-1 --right-of eDP-1 --output DP-1-2 --right-of DP-2-1

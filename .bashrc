@@ -138,7 +138,7 @@ echo $PATH | grep -Eq "(^|:)/usr/sbin(:|)" || PATH=$PATH:/usr/sbin
 echo $PATH | grep -Eq "(^|:)$HOME/.local/bin(:|)" || PATH=$PATH:$HOME/.local/bin
 echo $PATH | grep -Eq "(^|:)/usr/local/texlive/2021/bin/x86_64-linux(:|)" || PATH=$PATH:/usr/local/texlive/2021/bin/x86_64-linux
 
-if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx; fi
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx -display :7; fi
 
 alias config='cd ~/github/config'
 alias cls='clear'
