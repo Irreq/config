@@ -11,12 +11,13 @@
 
 sudo pacman -Syu \
 	cmake git openssh opendoas yay bash alacritty \
+	openssh networkmanager wget curl\
 	vim neovim vim-jedi python-jedi \
 	htop neofetch cmatrix feh \
 	alsa-lib alsa-utils pulseaudio pulsemixer \
 	texlive-bin texlive-core texlive-science mupdf \
 	clang llvm \
-	discord audacity atom \
+	discord audacity atom mps-youtube-git \
 	-y
 
 # Compiling
@@ -25,4 +26,9 @@ sudo pacman -Syu \
 # Development
  #llvm clang \
 	#-y
-
+# Install AUR
+cd /opt
+git clone https://aur.archlinux.org/yay-git.git
+chown -R irreq:irreq ./yay-git
+cd yay-git
+makepkg -si -y

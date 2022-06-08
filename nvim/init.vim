@@ -87,6 +87,17 @@ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 "    press Q to remove current cursor/selection
 "    start insert mode with i,a,I,A
 
+" Code Snippets
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+
+
+" Trigger configuration. You need to change this to something other than <tab> if you use one of the following:
+" - https://github.com/Valloric/YouCompleteMe
+" - https://github.com/nvim-lua/completion-nvim
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " Code Folding
 Plug 'tmhedberg/SimpylFold'
@@ -152,7 +163,7 @@ let maplocalleader = ","
 
 " A Vim Plugin for Lively Previewing LaTeX PDF Output
 Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
-
+" USAGE: :LLPStartPreview 
 let g:livepreview_previewer = 'okular'
 
 call plug#end()
