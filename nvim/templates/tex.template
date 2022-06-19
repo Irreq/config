@@ -1,7 +1,10 @@
+% Generic template
 \documentclass[12pt, a4, twoside]{article}
+\usepackage[english, swedish]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath, graphics} % Maths and Graphics are necessary
 
-\title{First document}
+\title{Title TODO}
 \author{{{NAME}}}
 \date{{{MONTH_FULL}} {{YEAR}}}
 
@@ -10,6 +13,13 @@
 \begin{titlepage}
 \maketitle
 \end{titlepage}
+
+\tableofcontents
+
+\section{Introduction}
+Foo Bar
+
+\subsection{Background}
 
 In this document some extra packages and parameters
 were added. There is an encoding package

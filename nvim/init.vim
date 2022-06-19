@@ -164,8 +164,9 @@ let maplocalleader = ","
 " A Vim Plugin for Lively Previewing LaTeX PDF Output
 Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
 " USAGE: :LLPStartPreview 
-let g:livepreview_previewer = 'okular'
 
+"let g:livepreview_previewer = 'mupdf'
+let g:livepreview_previewer = 'okular'
 call plug#end()
 
 "*****************************************************************************

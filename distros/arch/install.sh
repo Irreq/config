@@ -32,3 +32,11 @@ git clone https://aur.archlinux.org/yay-git.git
 chown -R irreq:irreq ./yay-git
 cd yay-git
 makepkg -si -y
+
+# Setup KDE Plasma 
+sudo pacman -S xorg plasma plasma-wayland-session sddm
+
+# SDDM
+sudo systemctl enable sddm.service
+sudo systemctl enable NetworkManager.service
+
