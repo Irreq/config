@@ -73,3 +73,8 @@ that is controlling the other terminals
 
 # For two screens
 xrandr --output DP-2-1 --right-of eDP-1 --output DP-1-2 --right-of DP-2-1
+
+
+
+# Start Thunderbolt 3 dock
+echo 1 > /sys/bus/wmi/devices/86CCFD48-205E-4A77-9C48-2021CBEDE341/force_power

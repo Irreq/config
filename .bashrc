@@ -142,7 +142,7 @@ if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then exec startx -display :7; 
 
 alias config='cd ~/github/config'
 alias cls='clear'
-
+alias sudo='doas'
 export EDITOR='nvim'
 
 export NVM_DIR="$HOME/.nvm"
