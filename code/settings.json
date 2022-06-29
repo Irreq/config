@@ -1,0 +1,27 @@
+{
+    "editor.tokenColorCustomizations": {},
+    "workbench.colorCustomizations": {
+        "terminal.background": "#282828",
+        "terminal.foreground": "#f8f8f2",
+        "terminalCursor.background": "#4D4D4C",
+        "terminalCursor.foreground": "#4D4D4C",
+        "terminal.ansiBlack": "#000000",
+        "terminal.ansiBlue": "#1459fc",
+        "terminal.ansiBrightBlack": "#555753",
+        "terminal.ansiBrightBlue": "#32afff",
+        "terminal.ansiBrightCyan": "#34e2e2",
+        "terminal.ansiBrightGreen": "#22d81c",
+        "terminal.ansiBrightMagenta": "#fd55ff",
+        "terminal.ansiBrightRed": "#ff0000",
+        "terminal.ansiBrightWhite": "#ffffff",
+        "terminal.ansiBrightYellow": "#ffff00",
+        "terminal.ansiCyan": "#06989a",
+        "terminal.ansiGreen": "#248902",
+        "terminal.ansiMagenta": "#6a00ff",
+        "terminal.ansiRed": "#960000",
+        "terminal.ansiWhite": "#d3d7cf",
+        "terminal.ansiYellow": "#fc8414"
+    },
+    "terminal.integrated.fontFamily": "'PxPlus HP 100LX 10x11'",
+    "terminal.integrated.fontSize": 11
+}
