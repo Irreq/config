@@ -35,24 +35,66 @@ esac
 
 
 if [ "$TERM" = "linux" ]; then
-    echo -en "\e]P0232323" #black
-    echo -en "\e]P82B2B2B" #darkgrey
-    echo -en "\e]P1D75F5F" #darkred
-    echo -en "\e]P9E33636" #red
-    echo -en "\e]P287AF5F" #darkgreen
-    echo -en "\e]PA98E34D" #green
-    echo -en "\e]P3D7AF87" #brown
-    echo -en "\e]PBFFD75F" #yellow
-    echo -en "\e]P48787AF" #darkblue
-    echo -en "\e]PC7373C9" #blue
-    echo -en "\e]P5BD53A5" #darkmagenta
-    echo -en "\e]PDD633B2" #magenta
-    echo -en "\e]P65FAFAF" #darkcyan
-    echo -en "\e]PE44C9C9" #cyan
-    echo -en "\e]P7E5E5E5" #lightgrey
-    echo -en "\e]PFFFFFFF" #white
-    clear #for background artifacting
+    # Cool oldschool font PxPlus HP located in /usr/share/kbd/consolefonts
+    # color_prompt=yes
+    #setfont ruscii_8x16.psfu.gz
+	echo -en "\e]P0000000" # 0 Black
+	echo -en "\e]P1960000" # 1 Red
+	echo -en "\e]P2248902" # 2 Green
+	echo -en "\e]P3fC8414" # 3 Orange
+	echo -en "\e]P41459FC" # 4 Blue
+	echo -en "\e]P56A00FF" # 5 Purple
+	echo -en "\e]P606989A" # 6 Turqoise
+	echo -en "\e]P7D3D7CF" # 7 Light Gray
+	echo -en "\e]P8555753" # 8 Dark Gray
+    echo -en "\e]P9FF0000" # 9 Bright Red
+    echo -en "\e]PA22D81C" # 10 Dark Green
+    echo -en "\e]PBFFFF00" # 11 Yellow
+    echo -en "\e]PC32AFFF" # 12 Light Blue
+    echo -en "\e]PDFD55FF" # 13 Pink
+    echo -en "\e]PE34E2E2" # 14 Cyan
+    echo -en "\e]PFFFFFFF" # 15 White
+	clear # for background artifacting
+
+    # export COLOR_NC='\e[0m' # No Color
+    # export COLOR_BLACK='\e[0;30m'
+    # export COLOR_GRAY='\e[1;30m'
+    # export COLOR_RED='\e[0;31m'
+    # export COLOR_LIGHT_RED='\e[1;31m'
+    # export COLOR_GREEN='\e[0;32m'
+    # export COLOR_LIGHT_GREEN='\e[1;32m'
+    # export COLOR_BROWN='\e[0;33m'
+    # export COLOR_YELLOW='\e[1;33m'
+    # export COLOR_BLUE='\e[0;34m'
+    # export COLOR_LIGHT_BLUE='\e[1;34m'
+    # export COLOR_PURPLE='\e[0;35m'
+    # export COLOR_LIGHT_PURPLE='\e[1;35m'
+    # export COLOR_CYAN='\e[0;36m'
+    # export COLOR_LIGHT_CYAN='\e[1;36m'
+    # export COLOR_LIGHT_GRAY='\e[0;37m'
+    # export COLOR_WHITE='\e[1;37m'
+
 fi
+
+#if [ "$TERM" = "linux" ]; then
+#    echo -en "\e]P0232323" #black
+#    echo -en "\e]P82B2B2B" #darkgrey
+#    echo -en "\e]P1D75F5F" #darkred
+#    echo -en "\e]P9E33636" #red
+#    echo -en "\e]P287AF5F" #darkgreen
+#    echo -en "\e]PA98E34D" #green
+#    echo -en "\e]P3D7AF87" #brown
+#    echo -en "\e]PBFFD75F" #yellow
+#    echo -en "\e]P48787AF" #darkblue
+#    echo -en "\e]PC7373C9" #blue
+#    echo -en "\e]P5BD53A5" #darkmagenta
+#    echo -en "\e]PDD633B2" #magenta
+#    echo -en "\e]P65FAFAF" #darkcyan
+#    echo -en "\e]PE44C9C9" #cyan
+#    echo -en "\e]P7E5E5E5" #lightgrey
+#    echo -en "\e]PFFFFFFF" #white
+#    clear #for background artifacting
+#fi
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
@@ -150,3 +192,21 @@ complete -cf doas
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/irreq/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/irreq/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/irreq/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/irreq/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
