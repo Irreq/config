@@ -136,3 +136,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+autoproject/skeletons/liucsthesis/
+autoproject/skeletons/cspaper/

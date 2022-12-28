@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# File: projectinit
+# Author: Irreq
+# Date: 2022-11-01 20:51:59.295250
+
+# sudo ln -s /home/USER/.config/config/autoproject/projectinit /usr/local/bin/projectinit
+
+"""
+Auto project initialization
+
+Usage:
+
+    projectinit <NAME> <TYPE>
+
+    or 
+
+    projectinit <NAME>.<EXTENSION>
+"""
+
+import sys
+import os
+
+# Absolute path to all skeletons
+skeleton_path = f"/home/{os.getlogin()}/.config/config/autoproject/skeletons/"
+
+import datetime
+
+blacklist = [".gitkeep"]
+
+class config:
+    USERNAME = "Irreq"
+    FULLNAME = "Isac Bruce"
+    EMAIL = "irreq@protonmail.com"
+
+    DATE = str(datetime.datetime.now())
+    YEAR = str(datetime.date.today().year)
+    MONTH = str(datetime.date.today().month)
+    MONTH_FULL = str(datetime.datetime.now().strftime('%B'))
+
+
+
+current_path = os.getcwd() + "/"
+
+try:
+    if len(sys.argv) == 3:
+        name, template = sys.argv[1], sys.argv[2]
+    elif len(sys.argv) == 2:
+        name, template = os.path.splitext(sys.argv[1])
+    
+        if template == "":
+            raise ValueError
+
+        name += template
+
+    if os.path.exists(name):
+        print(f"{name} already exists")
+        os._exit(1)
+        
+
+    # Placeholders to value
+    k = {item: config.__dict__[item] for item in config.__dict__ 
+        if item == item.upper()
+    }
+
+    k["PROJECT"] = name
+
+    k_items = list(k.keys())
+
+    def replacer(line_generator):
+        lines = []
+        for line in line_generator:
+            tmp = line
+            for ki in k_items:
+                if ki in line:
+                    tmp = tmp.replace(ki, k[ki])
+            if "FILEPATH" in line:
+                tmp = tmp.replace("FILEPATH", new_file)
+
+            lines.append(tmp)
+
+        return lines
+
+
+    # Find templates
+    templates = [skeleton_path+f for f in os.listdir(skeleton_path)]
+
+    projects = {name.split("/")[-1]:name for name in templates}
+
+    project_name = projects[template]
+
+    # For single file
+    if os.path.isfile(project_name):
+        with open(project_name, "rt") as fin:
+            new_file = name
+            lines = replacer(fin)
+
+            with open(new_file, "w") as fout:
+                print("Creating File: ", new_file)
+                fout.writelines(lines)
+                fout.close()
+            
+            fin.close()
+
+    # For entire project structure
+    else:
+
+        files = [os.path.join(dirpath,f)
+                 for (dirpath, dirnames, filenames) in os.walk(project_name)
+                 for f in filenames]
+
+        skel_path = skeleton_path + template + "/"
+
+        to_make = [name+"/"+file[len(skel_path):] for file in files]
+
+        created = []
+        for filename in to_make:
+            directory = "/".join(filename.split("/")[:-1])
+            if directory in created:
+                continue
+
+            print("Creating Directory: ", directory)
+
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            created.append(directory)
+
+        for file in files:
+            if os.path.split(file)[-1] in blacklist:
+                continue
+            with open(file, "rt") as fin:
+                new_file = name+"/"+file[len(skel_path):]
+                lines = replacer(fin)
+                
+                with open(new_file, "w") as fout:
+                    print("Creating File: ", new_file)
+                    fout.writelines(lines)
+                    fout.close()
+                
+                fin.close()
+except:
+    print(__doc__)
