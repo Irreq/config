@@ -34,8 +34,8 @@ window:
   # Blank space added around the window in pixels. This padding is scaled
   # by DPI and the specified value is always added at both opposing sides.
   padding:
-    x: 6
-    y: 6
+    x: 0 # 6
+    y: 0 # 6
 
   # Spread additional padding evenly around the terminal content.
   #dynamic_padding: false
@@ -103,16 +103,17 @@ scrolling:
 font:
   # Normal (roman) font face
   normal:
-    family: PxPlus HP 100LX 10x11
+    #family: PxPlus HP 100LX 10x11
+    family: JetbrainsMono Nerd Font
     style: Regular
 
   # Bold font face
   bold:
-    family: PxPlus HP 100LX 10x11
+    family: JetbrainsMono Nerd Font #PxPlus HP 100LX 10x11
     style: Bold
 
   # Point size
-  size: 9
+  size: 10
 
   # Offset is the extra space around each character. `offset.y` can be thought of
   # as modifying the line spacing, and `offset.x` as modifying the letter spacing.
@@ -234,8 +235,8 @@ live_config_reload: true
 #   - (macOS) /bin/bash --login
 #   - (Linux/BSD) user login shell
 #   - (Windows) powershell
-#shell:
-#  program: /bin/bash
+shell:
+  program: /bin/zsh
 #  args:
 #    - --login
 
