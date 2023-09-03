@@ -187,6 +187,12 @@ alias cls='clear'
 alias sudo='doas'
 export EDITOR='nvim'
 
+
+#alias update=yay -Suy --no-confirm
+#alias search=yay -Ss
+#alias install= yay -S
+
+
 complete -cf doas
 
 export NVM_DIR="$HOME/.nvm"
@@ -194,26 +200,14 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
+export PATH="/home/irreq/bin:$PATH"
 
 # Auto completion
 # Use bash-completion, if available
 [[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
     . /usr/share/bash-completion/bash_completion
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/irreq/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/irreq/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/irreq/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/irreq/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
 
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+[ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
